@@ -1,326 +1,368 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    --background: #0c0f14;
-    --text: #eef1f7;
-    --muted: #777f91;
-    --accent: #9ba8ff;
-    --accent-soft: rgba(155, 168, 255, 0.12);
-    --correct: #a5e8ba;
-}
-
-body {
-    min-height: 100vh;
-
-    background:
-        radial-gradient(
-            circle at 50% 30%,
-            #171c28 0%,
-            #0c0f14 60%
-        );
-
-    color: var(--text);
-
-    font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    overflow: hidden;
-}
+const gameArea = document.getElementById("gameArea");
+const welcome = document.getElementById("welcome");
+const startButton = document.getElementById("startButton");
+const scoreDisplay = document.getElementById("score");
 
 
-/* GAME */
+// --------------------------------------------------
+// WORD BANK
+// --------------------------------------------------
 
-.game {
-    height: 100vh;
+const words = [
 
-    display: flex;
-    flex-direction: column;
-}
+    "cat",
+    "dog",
+    "sun",
+    "moon",
+    "tree",
+    "book",
+    "rain",
+    "star",
+    "house",
+    "water",
+    "music",
+    "light",
+    "dream",
+    "cloud",
+    "flower",
+    "garden",
+    "window",
+    "forest",
+    "coffee",
+    "summer",
+    "winter",
+    "computer",
+    "keyboard",
+    "morning",
+    "evening",
+    "journey",
+    "adventure",
+    "beautiful",
+    "creative",
+    "peaceful"
+
+];
 
 
-/* TOP BAR */
+// --------------------------------------------------
+// LETTER BANK
+// --------------------------------------------------
 
-.top-bar {
-    height: 75px;
+const letters = "abcdefghijklmnopqrstuvwxyz";
 
-    padding: 0 35px;
 
-    display: flex;
+// --------------------------------------------------
+// GAME VARIABLES
+// --------------------------------------------------
 
-    align-items: center;
+let currentTarget = "";
 
-    justify-content: space-between;
+let currentElement = null;
 
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+let score = 0;
 
-    background: rgba(12,15,20,0.65);
+let gameStarted = false;
 
-    backdrop-filter: blur(15px);
 
-    z-index: 10;
-}
+// --------------------------------------------------
+// RANDOM LETTER
+// --------------------------------------------------
 
-.logo {
-    font-size: 21px;
+function randomLetter() {
 
-    font-weight: 700;
-}
+    return letters[
+        Math.floor(
+            Math.random() * letters.length
+        )
+    ];
 
-.logo span {
-    color: var(--accent);
-
-    margin-right: 7px;
-}
-
-.level {
-    position: absolute;
-
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    font-size: 13px;
-
-    color: var(--muted);
-
-    letter-spacing: 1px;
-
-    text-transform: uppercase;
-}
-
-.score {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-}
-
-.score span {
-    font-size: 12px;
-
-    color: var(--muted);
-}
-
-.score strong {
-    font-size: 18px;
-
-    font-weight: 500;
 }
 
 
-/* GAME AREA */
+// --------------------------------------------------
+// RANDOM WORD
+// --------------------------------------------------
 
-#gameArea {
-    position: relative;
+function randomWord() {
 
-    flex: 1;
+    return words[
+        Math.floor(
+            Math.random() * words.length
+        )
+    ];
 
-    overflow: hidden;
 }
 
 
-/* WELCOME */
+// --------------------------------------------------
+// CREATE TARGET
+// --------------------------------------------------
 
-.welcome {
-    position: absolute;
+function createTarget() {
 
-    top: 50%;
-    left: 50%;
+    // Remove previous target
 
-    transform: translate(-50%, -50%);
+    if (currentElement) {
 
-    text-align: center;
+        currentElement.remove();
 
-    width: 90%;
-
-    max-width: 500px;
-}
-
-.welcome-icon {
-    width: 70px;
-    height: 70px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    margin: 0 auto 25px;
-
-    border-radius: 20px;
-
-    background: var(--accent-soft);
-
-    color: var(--accent);
-
-    font-size: 30px;
-}
-
-.welcome h1 {
-    font-size: 48px;
-
-    letter-spacing: -2px;
-
-    margin-bottom: 15px;
-}
-
-.welcome p {
-    color: var(--muted);
-
-    line-height: 1.7;
-
-    font-size: 15px;
-}
-
-.welcome button {
-    margin-top: 30px;
-
-    border: 1px solid rgba(155,168,255,0.35);
-
-    background: var(--accent-soft);
-
-    color: var(--text);
-
-    padding: 13px 23px;
-
-    border-radius: 12px;
-
-    font-size: 14px;
-
-    cursor: pointer;
-
-    transition: 0.25s ease;
-}
-
-.welcome button:hover {
-    background: rgba(155,168,255,0.2);
-
-    transform: translateY(-2px);
-}
-
-
-/* GAME ITEM */
-
-.game-item {
-    position: absolute;
-
-    font-size: 25px;
-
-    font-weight: 500;
-
-    color: #aeb5c5;
-
-    letter-spacing: 0.5px;
-
-    cursor: default;
-
-    user-select: none;
-
-    animation: appear 0.25s ease;
-
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease,
-        color 0.2s ease;
-}
-
-
-/* Single letters are slightly larger */
-
-.game-item.single-letter {
-    font-size: 34px;
-
-    color: #c2c8d6;
-}
-
-
-/* Current target */
-
-.game-item.target {
-    color: var(--text);
-
-    text-shadow:
-        0 0 20px rgba(155,168,255,0.15);
-}
-
-
-/* Correct */
-
-.game-item.correct {
-    opacity: 0;
-
-    transform: scale(1.5);
-
-    color: var(--correct);
-}
-
-
-/* APPEAR */
-
-@keyframes appear {
-
-    from {
-        opacity: 0;
-
-        transform: scale(0.85);
     }
 
-    to {
-        opacity: 1;
 
-        transform: scale(1);
+    /*
+        60% chance of a single letter
+        40% chance of a word
+    */
+
+    const isLetter = Math.random() < 0.6;
+
+
+    if (isLetter) {
+
+        currentTarget = randomLetter();
+
+    } else {
+
+        currentTarget = randomWord();
+
+    }
+
+
+    // Create element
+
+    const element = document.createElement("div");
+
+    element.classList.add("game-item");
+
+    element.textContent = currentTarget;
+
+
+    if (isLetter) {
+
+        element.classList.add("single-letter");
+
+    }
+
+
+    // --------------------------------------------------
+    // RANDOM POSITION
+    // --------------------------------------------------
+
+    const areaWidth = gameArea.clientWidth;
+
+    const areaHeight = gameArea.clientHeight;
+
+
+    const padding = 80;
+
+
+    const maxX = Math.max(
+        padding,
+        areaWidth - padding
+    );
+
+
+    const maxY = Math.max(
+        padding,
+        areaHeight - padding
+    );
+
+
+    const x =
+        Math.random() *
+        (maxX - padding) +
+        padding;
+
+
+    const y =
+        Math.random() *
+        (maxY - padding) +
+        padding;
+
+
+    element.style.left = `${x}px`;
+
+    element.style.top = `${y}px`;
+
+
+    // Add to screen
+
+    gameArea.appendChild(element);
+
+
+    currentElement = element;
+
+}
+
+
+// --------------------------------------------------
+// START GAME
+// --------------------------------------------------
+
+function startGame() {
+
+    gameStarted = true;
+
+    score = 0;
+
+    scoreDisplay.textContent = score;
+
+
+    welcome.style.display = "none";
+
+
+    createTarget();
+
+}
+
+
+// --------------------------------------------------
+// KEYBOARD INPUT
+// --------------------------------------------------
+
+document.addEventListener("keydown", (event) => {
+
+    if (!gameStarted) {
+        return;
+    }
+
+
+    /*
+        Ignore special keys
+        like Shift, Ctrl, Alt, etc.
+    */
+
+    if (event.key.length !== 1) {
+        return;
+    }
+
+
+    const typedKey = event.key.toLowerCase();
+
+
+    // --------------------------------------------------
+    // SINGLE LETTER
+    // --------------------------------------------------
+
+    if (currentTarget.length === 1) {
+
+        if (typedKey === currentTarget) {
+
+            targetCompleted();
+
+        }
+
+        return;
+    }
+
+
+    // --------------------------------------------------
+    // WORD
+    // --------------------------------------------------
+
+    /*
+        For words we keep track of what the user
+        has typed so far.
+    */
+
+    handleWordTyping(typedKey);
+
+});
+
+
+// --------------------------------------------------
+// WORD TYPING
+// --------------------------------------------------
+
+let typedWord = "";
+
+
+function handleWordTyping(key) {
+
+    /*
+        Add typed character
+    */
+
+    typedWord += key;
+
+
+    /*
+        Check whether the typed part matches
+        the beginning of the target.
+    */
+
+    if (
+        !currentTarget.startsWith(typedWord)
+    ) {
+
+        /*
+            Wrong character.
+
+            We don't punish the player.
+
+            Instead, simply reset the current word
+            so they can try again.
+        */
+
+        typedWord = "";
+
+        return;
+    }
+
+
+    /*
+        Word completed
+    */
+
+    if (typedWord === currentTarget) {
+
+        typedWord = "";
+
+        targetCompleted();
+
     }
 
 }
 
 
-/* FOOTER */
+// --------------------------------------------------
+// TARGET COMPLETED
+// --------------------------------------------------
 
-footer {
-    height: 45px;
+function targetCompleted() {
 
-    display: flex;
+    if (!currentElement) {
+        return;
+    }
 
-    align-items: center;
 
-    justify-content: center;
+    currentElement.classList.add("correct");
 
-    color: #505765;
 
-    font-size: 12px;
+    score++;
 
-    border-top: 1px solid rgba(255,255,255,0.03);
+    scoreDisplay.textContent = score;
+
+
+    /*
+        Small delay makes the disappearance
+        feel smoother.
+    */
+
+    setTimeout(() => {
+
+        createTarget();
+
+    }, 180);
+
 }
 
 
-/* MOBILE */
+// --------------------------------------------------
+// START BUTTON
+// --------------------------------------------------
 
-@media (max-width: 600px) {
-
-    .top-bar {
-        padding: 0 18px;
-    }
-
-    .welcome h1 {
-        font-size: 38px;
-    }
-
-    .game-item {
-        font-size: 21px;
-    }
-
-    .game-item.single-letter {
-        font-size: 30px;
-    }
-
-}
+startButton.addEventListener(
+    "click",
+    startGame
+);
