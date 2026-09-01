@@ -1,3 +1,7 @@
+// =====================================================
+// ELEMENTS
+// =====================================================
+
 const gameArea =
     document.getElementById("gameArea");
 
@@ -10,140 +14,415 @@ const startButton =
 const scoreDisplay =
     document.getElementById("score");
 
+const speedButtons =
+    document.querySelectorAll(".speed-option");
 
-// ==================================================
+
+// =====================================================
 // WORD BANK
-// ==================================================
+// =====================================================
 
 const words = [
 
+    // Short & Easy
     "cat",
     "dog",
     "sun",
+    "sky",
     "moon",
+    "star",
+    "rain",
     "tree",
     "book",
-    "rain",
-    "star",
-    "house",
+    "pen",
+    "cup",
+    "car",
+    "bus",
+    "box",
+    "ball",
+    "fish",
+    "bird",
+    "door",
+    "road",
+    "home",
+    "room",
+    "food",
+    "milk",
+    "cake",
+    "rice",
     "water",
-    "music",
-    "light",
-    "dream",
-    "cloud",
-    "flower",
-    "garden",
+    "fire",
+    "wind",
+    "snow",
+    "sand",
+
+    // Everyday Words
+    "house",
+    "school",
+    "friend",
+    "family",
+    "phone",
+    "table",
+    "chair",
     "window",
-    "forest",
+    "garden",
+    "flower",
     "coffee",
-    "summer",
-    "winter",
-    "computer",
-    "keyboard",
+    "music",
+    "movie",
+    "game",
+    "world",
+    "night",
     "morning",
     "evening",
-    "journey",
+    "summer",
+    "winter",
+    "spring",
+    "autumn",
+    "street",
+    "market",
+    "store",
+    "office",
+    "camera",
+    "screen",
+    "light",
+    "cloud",
+
+    // Fun Words
+    "happy",
+    "smile",
+    "dream",
+    "magic",
+    "power",
+    "energy",
+    "speed",
+    "focus",
+    "brain",
+    "smart",
+    "quick",
+    "strong",
+    "brave",
+    "funny",
+    "laugh",
+    "dance",
+    "party",
+    "music",
+    "story",
+    "movie",
+    "anime",
+    "gaming",
+    "player",
+    "level",
+    "score",
+    "quest",
+    "hero",
+    "battle",
+    "pixel",
+    "dragon",
+
+    // Nature
+    "ocean",
+    "river",
+    "mountain",
+    "forest",
+    "island",
+    "beach",
+    "earth",
+    "planet",
+    "flower",
+    "garden",
+    "grass",
+    "leaf",
+    "stone",
+    "wood",
+    "tree",
+    "rain",
+    "storm",
+    "thunder",
+    "sunshine",
+    "sunset",
+    "sunrise",
+    "moonlight",
+    "starlight",
+    "rainbow",
+    "breeze",
+
+    // Technology
+    "computer",
+    "keyboard",
+    "mouse",
+    "laptop",
+    "mobile",
+    "internet",
+    "website",
+    "browser",
+    "coding",
+    "program",
+    "screen",
+    "server",
+    "network",
+    "digital",
+    "online",
+    "system",
+    "window",
+    "folder",
+    "file",
+    "data",
+    "robot",
+    "future",
+    "technology",
+    "software",
+    "hardware",
+
+    // Medium Words
     "adventure",
     "beautiful",
     "creative",
-    "peaceful"
+    "peaceful",
+    "freedom",
+    "journey",
+    "discover",
+    "explore",
+    "imagine",
+    "inspire",
+    "perfect",
+    "amazing",
+    "awesome",
+    "wonderful",
+    "fantastic",
+    "positive",
+    "simple",
+    "natural",
+    "special",
+    "different",
+    "favorite",
+    "together",
+    "remember",
+    "believe",
+    "success",
+    "challenge",
+    "practice",
+    "progress",
+    "future",
+    "dreamer",
+
+    // More Variety
+    "apple",
+    "banana",
+    "orange",
+    "mango",
+    "pizza",
+    "burger",
+    "noodle",
+    "bread",
+    "sugar",
+    "honey",
+    "water",
+    "juice",
+    "breakfast",
+    "lunch",
+    "dinner",
+    "kitchen",
+    "school",
+    "teacher",
+    "student",
+    "college",
+    "library",
+    "notebook",
+    "pencil",
+    "paper",
+    "lesson",
+    "question",
+    "answer",
+    "learn",
+    "study",
+    "knowledge"
 
 ];
 
 
-// ==================================================
+// =====================================================
 // LETTER BANK
-// ==================================================
+// =====================================================
 
 const letters =
     "abcdefghijklmnopqrstuvwxyz";
 
 
-// ==================================================
+// =====================================================
+// SPEED SETTINGS
+// =====================================================
+
+const speedSettings = {
+
+    slow: {
+
+        fallTime: 9500,
+
+        spawnTime: 1500
+
+    },
+
+    easy: {
+
+        fallTime: 7500,
+
+        spawnTime: 1200
+
+    },
+
+    normal: {
+
+        fallTime: 6000,
+
+        spawnTime: 950
+
+    },
+
+    fast: {
+
+        fallTime: 4500,
+
+        spawnTime: 750
+
+    },
+
+    "very-fast": {
+
+        fallTime: 3200,
+
+        spawnTime: 600
+
+    }
+
+};
+
+
+// =====================================================
 // GAME VARIABLES
-// ==================================================
+// =====================================================
 
-let currentTarget = "";
-
-let currentElement = null;
-
-let score = 0;
+let selectedSpeed = "slow";
 
 let gameStarted = false;
 
-let typedWord = "";
+let score = 0;
 
-let acceptingInput = true;
+let spawnTimer = null;
+
+let targets = [];
 
 
-// ==================================================
+// =====================================================
 // RANDOM LETTER
-// ==================================================
+// =====================================================
 
-function randomLetter() {
+function getRandomLetter() {
 
     return letters[
         Math.floor(
-            Math.random() * letters.length
+            Math.random() *
+            letters.length
         )
     ];
 
 }
 
 
-// ==================================================
+// =====================================================
 // RANDOM WORD
-// ==================================================
+// =====================================================
 
-function randomWord() {
+function getRandomWord() {
 
     return words[
         Math.floor(
-            Math.random() * words.length
+            Math.random() *
+            words.length
         )
     ];
 
 }
 
 
-// ==================================================
-// CREATE TARGET
-// ==================================================
+// =====================================================
+// RANDOM TARGET
+// =====================================================
+
+function getRandomTarget() {
+
+    /*
+        60% letter
+        40% word
+    */
+
+    if (Math.random() < 0.60) {
+
+        return {
+
+            text: getRandomLetter(),
+
+            isLetter: true
+
+        };
+
+    }
+
+
+    return {
+
+        text: getRandomWord(),
+
+        isLetter: false
+
+    };
+
+}
+
+
+// =====================================================
+// SPEED BUTTONS
+// =====================================================
+
+speedButtons.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            speedButtons.forEach(
+                item => {
+
+                    item.classList.remove(
+                        "active"
+                    );
+
+                }
+            );
+
+
+            button.classList.add(
+                "active"
+            );
+
+
+            selectedSpeed =
+                button.dataset.speed;
+
+        }
+    );
+
+});
+
+
+// =====================================================
+// CREATE FALLING TARGET
+// =====================================================
 
 function createTarget() {
 
-    if (currentElement) {
-
-        currentElement.remove();
-
-    }
-
-
-    typedWord = "";
-
-    acceptingInput = true;
-
-
-    /*
-        60% letters
-        40% words
-    */
-
-    const isLetter =
-        Math.random() < 0.60;
-
-
-    if (isLetter) {
-
-        currentTarget =
-            randomLetter();
-
-    } else {
-
-        currentTarget =
-            randomWord();
-
-    }
+    const target =
+        getRandomTarget();
 
 
     const element =
@@ -151,58 +430,11 @@ function createTarget() {
 
 
     element.classList.add(
-        "game-item"
+        "falling-item"
     );
 
 
-    /*
-        WORD
-    */
-
-    if (!isLetter) {
-
-        currentTarget
-            .split("")
-            .forEach((character, index) => {
-
-                const span =
-                    document.createElement("span");
-
-                span.classList.add(
-                    "target-character"
-                );
-
-                span.textContent =
-                    character;
-
-                /*
-                    First character is the
-                    current character.
-                */
-
-                if (index === 0) {
-
-                    span.classList.add(
-                        "current"
-                    );
-
-                }
-
-                element.appendChild(span);
-
-            });
-
-    }
-
-
-    /*
-        SINGLE LETTER
-    */
-
-    else {
-
-        element.textContent =
-            currentTarget;
+    if (target.isLetter) {
 
         element.classList.add(
             "single-letter"
@@ -212,55 +444,229 @@ function createTarget() {
 
 
     /*
-        RANDOM POSITION
+        Create individual characters
+        for words.
     */
+
+    if (!target.isLetter) {
+
+        target.text
+            .split("")
+            .forEach(
+                (character, index) => {
+
+                    const span =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    span.classList.add(
+                        "character"
+                    );
+
+
+                    span.textContent =
+                        character;
+
+
+                    /*
+                        First character
+                        starts highlighted.
+                    */
+
+                    if (index === 0) {
+
+                        span.classList.add(
+                            "current"
+                        );
+
+                    }
+
+
+                    element.appendChild(
+                        span
+                    );
+
+                }
+            );
+
+    }
+
+    else {
+
+        element.textContent =
+            target.text;
+
+    }
+
+
+    // =================================================
+    // RANDOM HORIZONTAL POSITION
+    // =================================================
 
     const areaWidth =
         gameArea.clientWidth;
 
-    const areaHeight =
-        gameArea.clientHeight;
 
-    const padding = 80;
+    const maxWidth =
+        Math.max(
+            50,
+            areaWidth - 120
+        );
 
 
     const x =
+        30 +
         Math.random() *
         Math.max(
             1,
-            areaWidth - padding * 2
-        ) + padding;
-
-
-    const y =
-        Math.random() *
-        Math.max(
-            1,
-            areaHeight - padding * 2
-        ) + padding;
+            maxWidth - 30
+        );
 
 
     element.style.left =
         `${x}px`;
 
-    element.style.top =
-        `${y}px`;
 
+    // =================================================
+    // FALL SPEED
+    // =================================================
+
+    const settings =
+        speedSettings[selectedSpeed];
+
+
+    element.style.animationDuration =
+        `${settings.fallTime}ms`;
+
+
+    /*
+        Add target to game area.
+    */
 
     gameArea.appendChild(
         element
     );
 
 
-    currentElement =
-        element;
+    /*
+        Store target.
+    */
+
+    targets.push({
+
+        element: element,
+
+        text: target.text,
+
+        typed: "",
+
+        isLetter: target.isLetter,
+
+        createdAt: Date.now()
+
+    });
+
+
+    /*
+        Clean target when animation ends.
+    */
+
+    setTimeout(() => {
+
+        removeTarget(
+            element
+        );
+
+    }, settings.fallTime + 300);
 
 }
 
 
-// ==================================================
+// =====================================================
+// REMOVE TARGET
+// =====================================================
+
+function removeTarget(element) {
+
+    const index =
+        targets.findIndex(
+            target =>
+                target.element === element
+        );
+
+
+    if (index !== -1) {
+
+        targets.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    if (
+        element &&
+        element.parentNode
+    ) {
+
+        element.remove();
+
+    }
+
+}
+
+
+// =====================================================
+// SPAWN LOOP
+// =====================================================
+
+function startSpawning() {
+
+    stopSpawning();
+
+
+    const settings =
+        speedSettings[selectedSpeed];
+
+
+    createTarget();
+
+
+    spawnTimer =
+        setInterval(() => {
+
+            createTarget();
+
+        }, settings.spawnTime);
+
+}
+
+
+// =====================================================
+// STOP SPAWNING
+// =====================================================
+
+function stopSpawning() {
+
+    if (spawnTimer) {
+
+        clearInterval(
+            spawnTimer
+        );
+
+        spawnTimer = null;
+
+    }
+
+}
+
+
+// =====================================================
 // START GAME
-// ==================================================
+// =====================================================
 
 function startGame() {
 
@@ -271,35 +677,31 @@ function startGame() {
     scoreDisplay.textContent =
         score;
 
+
     welcome.style.display =
         "none";
 
-    createTarget();
+
+    startSpawning();
 
 }
 
 
-// ==================================================
-// KEYBOARD
-// ==================================================
+// =====================================================
+// KEYBOARD INPUT
+// =====================================================
 
 document.addEventListener(
     "keydown",
-    (event) => {
+    event => {
 
         if (!gameStarted) {
             return;
         }
 
 
-        if (!acceptingInput) {
-            return;
-        }
-
-
         /*
-            Ignore Shift, Ctrl, Alt,
-            Enter, Arrow keys etc.
+            Ignore special keys.
         */
 
         if (event.key.length !== 1) {
@@ -312,86 +714,112 @@ document.addEventListener(
 
 
         /*
-            SINGLE LETTER
+            Find a target that can accept
+            this character.
+
+            This means the user can type
+            whichever visible target they want.
         */
 
-        if (
-            currentTarget.length === 1
-        ) {
+        const matchingTarget =
+            findMatchingTarget(key);
 
-            if (
-                key === currentTarget
-            ) {
 
-                correctSingleLetter();
+        if (matchingTarget) {
 
-            } else {
-
-                wrongInput();
-
-            }
-
-            return;
+            handleCorrectInput(
+                matchingTarget,
+                key
+            );
 
         }
 
+        else {
 
-        /*
-            WORD
-        */
+            handleWrongInput();
 
-        handleWordTyping(key);
+        }
 
     }
 );
 
 
-// ==================================================
-// WORD TYPING
-// ==================================================
+// =====================================================
+// FIND MATCHING TARGET
+// =====================================================
 
-function handleWordTyping(key) {
-
-    /*
-        Character user is currently
-        supposed to type.
-    */
-
-    const currentIndex =
-        typedWord.length;
-
-
-    const expectedCharacter =
-        currentTarget[
-            currentIndex
-        ];
-
+function findMatchingTarget(key) {
 
     /*
-        CORRECT
+        Look for a target where the typed
+        key is the next expected character.
     */
 
-    if (
-        key === expectedCharacter
+    for (
+        const target of targets
     ) {
 
-        typedWord += key;
+        const nextCharacter =
+            target.text[
+                target.typed.length
+            ];
 
-
-        updateWordProgress();
-
-
-        /*
-            Whole word completed
-        */
 
         if (
-            typedWord === currentTarget
+            nextCharacter === key
         ) {
 
-            targetCompleted();
+            return target;
 
         }
+
+    }
+
+
+    return null;
+
+}
+
+
+// =====================================================
+// CORRECT INPUT
+// =====================================================
+
+function handleCorrectInput(
+    target,
+    key
+) {
+
+    target.typed += key;
+
+
+    /*
+        SINGLE LETTER
+    */
+
+    if (target.isLetter) {
+
+        target.element.classList.add(
+            "correct"
+        );
+
+
+        createBurst(
+            target.element,
+            target.text
+        );
+
+
+        score++;
+
+        scoreDisplay.textContent =
+            score;
+
+
+        removeTarget(
+            target.element
+        );
+
 
         return;
 
@@ -399,23 +827,52 @@ function handleWordTyping(key) {
 
 
     /*
-        WRONG
+        WORD
     */
 
-    wrongInput();
+    updateTargetVisual(
+        target
+    );
+
+
+    /*
+        WORD COMPLETED
+    */
+
+    if (
+        target.typed === target.text
+    ) {
+
+        createBurst(
+            target.element,
+            target.text
+        );
+
+
+        score++;
+
+        scoreDisplay.textContent =
+            score;
+
+
+        removeTarget(
+            target.element
+        );
+
+    }
 
 }
 
 
-// ==================================================
-// UPDATE WORD PROGRESS
-// ==================================================
+// =====================================================
+// UPDATE WORD VISUAL
+// =====================================================
 
-function updateWordProgress() {
+function updateTargetVisual(target) {
 
     const characters =
-        currentElement.querySelectorAll(
-            ".target-character"
+        target.element.querySelectorAll(
+            ".character"
         );
 
 
@@ -423,12 +880,21 @@ function updateWordProgress() {
         (character, index) => {
 
             character.classList.remove(
+                "correct"
+            );
+
+            character.classList.remove(
                 "current"
             );
 
 
+            /*
+                Already typed
+            */
+
             if (
-                index < typedWord.length
+                index <
+                target.typed.length
             ) {
 
                 character.classList.add(
@@ -437,61 +903,92 @@ function updateWordProgress() {
 
             }
 
+
+            /*
+                Current character
+            */
+
+            else if (
+                index ===
+                target.typed.length
+            ) {
+
+                character.classList.add(
+                    "current"
+                );
+
+            }
+
         }
     );
-
-
-    /*
-        Highlight next character
-    */
-
-    if (
-        typedWord.length <
-        characters.length
-    ) {
-
-        characters[
-            typedWord.length
-        ].classList.add(
-            "current"
-        );
-
-    }
 
 }
 
 
-// ==================================================
+// =====================================================
 // WRONG INPUT
-// ==================================================
+// =====================================================
 
-function wrongInput() {
+function handleWrongInput() {
 
-    if (!currentElement) {
+    /*
+        If there are targets on screen,
+        shake the nearest/current one.
+    */
+
+    if (targets.length === 0) {
         return;
     }
 
 
     /*
-        Remove previous wrong state
-        so animation can restart.
+        Pick the lowest visible target
+        as the feedback target.
     */
 
-    currentElement.classList.remove(
+    let target =
+        targets[0];
+
+
+    for (
+        const item of targets
+    ) {
+
+        if (
+            item.element.offsetTop >
+            target.element.offsetTop
+        ) {
+
+            target = item;
+
+        }
+
+    }
+
+
+    const element =
+        target.element;
+
+
+    /*
+        Restart animation.
+    */
+
+    element.classList.remove(
         "wrong"
     );
 
 
-    void currentElement.offsetWidth;
+    void element.offsetWidth;
 
 
-    currentElement.classList.add(
+    element.classList.add(
         "wrong"
     );
 
 
     /*
-        Mobile vibration
+        Mobile haptic feedback.
     */
 
     if (
@@ -503,16 +1000,14 @@ function wrongInput() {
     }
 
 
-    /*
-        Remove red state after
-        a short moment.
-    */
-
     setTimeout(() => {
 
-        if (currentElement) {
+        if (
+            element &&
+            element.parentNode
+        ) {
 
-            currentElement.classList.remove(
+            element.classList.remove(
                 "wrong"
             );
 
@@ -523,69 +1018,18 @@ function wrongInput() {
 }
 
 
-// ==================================================
-// CORRECT SINGLE LETTER
-// ==================================================
+// =====================================================
+// BURST EFFECT
+// =====================================================
 
-function correctSingleLetter() {
-
-    if (!currentElement) {
-        return;
-    }
-
-
-    /*
-        Green feedback first
-    */
-
-    currentElement.classList.add(
-        "correct-letter"
-    );
-
-
-    /*
-        Small delay before burst
-        so user sees the green state.
-    */
-
-    setTimeout(() => {
-
-        targetCompleted();
-
-    }, 100);
-
-}
-
-
-// ==================================================
-// TARGET COMPLETED
-// ==================================================
-
-function targetCompleted() {
-
-    if (
-        !currentElement ||
-        !acceptingInput
-    ) {
-
-        return;
-
-    }
-
-
-    acceptingInput = false;
-
-
-    const element =
-        currentElement;
-
-
-    /*
-        Get target position
-    */
+function createBurst(
+    element,
+    text
+) {
 
     const rect =
         element.getBoundingClientRect();
+
 
     const areaRect =
         gameArea.getBoundingClientRect();
@@ -604,57 +1048,7 @@ function targetCompleted() {
 
 
     /*
-        Create burst
-    */
-
-    createBurst(
-        currentTarget,
-        centerX,
-        centerY
-    );
-
-
-    element.remove();
-
-    currentElement =
-        null;
-
-
-    /*
-        Progress
-    */
-
-    score++;
-
-    scoreDisplay.textContent =
-        score;
-
-
-    /*
-        Next target
-    */
-
-    setTimeout(() => {
-
-        createTarget();
-
-    }, 420);
-
-}
-
-
-// ==================================================
-// BURST EFFECT
-// ==================================================
-
-function createBurst(
-    text,
-    x,
-    y
-) {
-
-    /*
-        Center flash
+        Central flash.
     */
 
     const flash =
@@ -667,11 +1061,11 @@ function createBurst(
 
 
     flash.style.left =
-        `${x - 5}px`;
+        `${centerX - 5}px`;
 
 
     flash.style.top =
-        `${y - 5}px`;
+        `${centerY - 5}px`;
 
 
     gameArea.appendChild(
@@ -687,7 +1081,8 @@ function createBurst(
 
 
     /*
-        Turn target into particles
+        Convert the target into
+        flying letters.
     */
 
     let characters =
@@ -695,15 +1090,15 @@ function createBurst(
 
 
     /*
-        Single letters produce
-        random mini letters.
+        Single letters create
+        extra random letters.
     */
 
     if (
         characters.length === 1
     ) {
 
-        const randomCharacters =
+        const randomLetters =
             "abcdefghijklmnopqrstuvwxyz";
 
 
@@ -714,10 +1109,10 @@ function createBurst(
         ) {
 
             characters.push(
-                randomCharacters[
+                randomLetters[
                     Math.floor(
                         Math.random() *
-                        randomCharacters.length
+                        randomLetters.length
                     )
                 ]
             );
@@ -727,15 +1122,13 @@ function createBurst(
     }
 
 
-    /*
-        Create particles
-    */
-
     characters.forEach(
         (character, index) => {
 
             const particle =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
 
 
             particle.classList.add(
@@ -748,15 +1141,15 @@ function createBurst(
 
 
             particle.style.left =
-                `${x}px`;
+                `${centerX}px`;
 
 
             particle.style.top =
-                `${y}px`;
+                `${centerY}px`;
 
 
             /*
-                Random direction
+                Random direction.
             */
 
             const angle =
@@ -766,8 +1159,9 @@ function createBurst(
 
 
             const distance =
-                35 +
-                Math.random() * 80;
+                30 +
+                Math.random() *
+                90;
 
 
             const moveX =
@@ -781,8 +1175,10 @@ function createBurst(
 
 
             const rotation =
-                (Math.random() - 0.5) *
-                360;
+                (
+                    Math.random() -
+                    0.5
+                ) * 360;
 
 
             particle.style.setProperty(
@@ -803,18 +1199,6 @@ function createBurst(
             );
 
 
-            /*
-                Random particle size
-            */
-
-            particle.style.fontSize =
-                `${12 + Math.random() * 8}px`;
-
-
-            /*
-                Tiny stagger
-            */
-
             particle.style.animationDelay =
                 `${index * 15}ms`;
 
@@ -828,7 +1212,7 @@ function createBurst(
 
                 particle.remove();
 
-            }, 800);
+            }, 850);
 
         }
     );
@@ -836,9 +1220,9 @@ function createBurst(
 }
 
 
-// ==================================================
+// =====================================================
 // START BUTTON
-// ==================================================
+// =====================================================
 
 startButton.addEventListener(
     "click",
