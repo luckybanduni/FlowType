@@ -1,7 +1,14 @@
-const gameArea = document.getElementById("gameArea");
-const welcome = document.getElementById("welcome");
-const startButton = document.getElementById("startButton");
-const scoreDisplay = document.getElementById("score");
+const gameArea =
+    document.getElementById("gameArea");
+
+const welcome =
+    document.getElementById("welcome");
+
+const startButton =
+    document.getElementById("startButton");
+
+const scoreDisplay =
+    document.getElementById("score");
 
 
 // ==================================================
@@ -39,69 +46,7 @@ const words = [
     "adventure",
     "beautiful",
     "creative",
-    "peaceful",
-    "Bicycle",
-    "Library",
-    "Diamond",
-    "Theater",
-    "Rainbow",
-    "Machine",
-    "Vehicle",
-    "Sunrise",
-    "Freedom",
-    "Harmony",
-    "Kitchen",
-"Country",
-"Network",
-"Journey",
-"Mystery",
-"Curtain",
-"Promise",
-"Handbag",
-"Balloon",
-"Weather",
-"Cottage",
-"Blanket",
-"Plumage",
-"Biscuit",
-"Iceberg",
-"Cupcake",
-"Earring",
-"Desktop",
-"Company",
-"Example",
-"Council",
-"Service",
-"Problem",
-"Control",
-"Society",
-"Process",
-"Support",
-"Morning",
-"Century",
-"History",
-"Section",
-"Subject",
-"Quality",
-"Project",
-"Chapter",
-"Manager",
-"Account",
-"Success",
-"Capital",
-"Defense",
-"Product",
-"Village",
-"Husband",
-"Science",
-"Economy",
-"Picture",
-"College",
-"Station",
-"Species",
-"Concern",
-"Purpose",
-"Ability",
+    "peaceful"
 
 ];
 
@@ -110,7 +55,8 @@ const words = [
 // LETTER BANK
 // ==================================================
 
-const letters = "abcdefghijklmnopqrstuvwxyz";
+const letters =
+    "abcdefghijklmnopqrstuvwxyz";
 
 
 // ==================================================
@@ -179,45 +125,101 @@ function createTarget() {
 
 
     /*
-        60% single letters
+        60% letters
         40% words
     */
 
-    const isLetter = Math.random() < 0.60;
+    const isLetter =
+        Math.random() < 0.60;
 
 
     if (isLetter) {
 
-        currentTarget = randomLetter();
+        currentTarget =
+            randomLetter();
 
     } else {
 
-        currentTarget = randomWord();
+        currentTarget =
+            randomWord();
 
     }
 
 
-    const element = document.createElement("div");
-
-    element.classList.add("game-item");
-
-    element.textContent = currentTarget;
+    const element =
+        document.createElement("div");
 
 
-    if (isLetter) {
+    element.classList.add(
+        "game-item"
+    );
 
-        element.classList.add("single-letter");
+
+    /*
+        WORD
+    */
+
+    if (!isLetter) {
+
+        currentTarget
+            .split("")
+            .forEach((character, index) => {
+
+                const span =
+                    document.createElement("span");
+
+                span.classList.add(
+                    "target-character"
+                );
+
+                span.textContent =
+                    character;
+
+                /*
+                    First character is the
+                    current character.
+                */
+
+                if (index === 0) {
+
+                    span.classList.add(
+                        "current"
+                    );
+
+                }
+
+                element.appendChild(span);
+
+            });
 
     }
 
 
     /*
-        Random position
+        SINGLE LETTER
     */
 
-    const areaWidth = gameArea.clientWidth;
+    else {
 
-    const areaHeight = gameArea.clientHeight;
+        element.textContent =
+            currentTarget;
+
+        element.classList.add(
+            "single-letter"
+        );
+
+    }
+
+
+    /*
+        RANDOM POSITION
+    */
+
+    const areaWidth =
+        gameArea.clientWidth;
+
+    const areaHeight =
+        gameArea.clientHeight;
 
     const padding = 80;
 
@@ -238,14 +240,20 @@ function createTarget() {
         ) + padding;
 
 
-    element.style.left = `${x}px`;
+    element.style.left =
+        `${x}px`;
 
-    element.style.top = `${y}px`;
+    element.style.top =
+        `${y}px`;
 
 
-    gameArea.appendChild(element);
+    gameArea.appendChild(
+        element
+    );
 
-    currentElement = element;
+
+    currentElement =
+        element;
 
 }
 
@@ -260,9 +268,11 @@ function startGame() {
 
     score = 0;
 
-    scoreDisplay.textContent = score;
+    scoreDisplay.textContent =
+        score;
 
-    welcome.style.display = "none";
+    welcome.style.display =
+        "none";
 
     createTarget();
 
@@ -270,60 +280,70 @@ function startGame() {
 
 
 // ==================================================
-// KEYBOARD INPUT
+// KEYBOARD
 // ==================================================
 
-document.addEventListener("keydown", (event) => {
+document.addEventListener(
+    "keydown",
+    (event) => {
 
-    if (!gameStarted) {
-        return;
-    }
-
-
-    if (!acceptingInput) {
-        return;
-    }
+        if (!gameStarted) {
+            return;
+        }
 
 
-    /*
-        Ignore Shift, Ctrl, Alt, Enter, etc.
-    */
-
-    if (event.key.length !== 1) {
-        return;
-    }
+        if (!acceptingInput) {
+            return;
+        }
 
 
-    const key = event.key.toLowerCase();
+        /*
+            Ignore Shift, Ctrl, Alt,
+            Enter, Arrow keys etc.
+        */
+
+        if (event.key.length !== 1) {
+            return;
+        }
 
 
-    // ==================================================
-    // SINGLE LETTER
-    // ==================================================
+        const key =
+            event.key.toLowerCase();
 
-    if (currentTarget.length === 1) {
 
-        if (key === currentTarget) {
+        /*
+            SINGLE LETTER
+        */
 
-            targetCompleted();
+        if (
+            currentTarget.length === 1
+        ) {
 
-        } else {
+            if (
+                key === currentTarget
+            ) {
 
-            wrongInput();
+                correctSingleLetter();
+
+            } else {
+
+                wrongInput();
+
+            }
+
+            return;
 
         }
 
-        return;
+
+        /*
+            WORD
+        */
+
+        handleWordTyping(key);
+
     }
-
-
-    // ==================================================
-    // WORD
-    // ==================================================
-
-    handleWordTyping(key);
-
-});
+);
 
 
 // ==================================================
@@ -332,19 +352,37 @@ document.addEventListener("keydown", (event) => {
 
 function handleWordTyping(key) {
 
-    typedWord += key;
+    /*
+        Character user is currently
+        supposed to type.
+    */
+
+    const currentIndex =
+        typedWord.length;
+
+
+    const expectedCharacter =
+        currentTarget[
+            currentIndex
+        ];
 
 
     /*
-        Correct so far
+        CORRECT
     */
 
     if (
-        currentTarget.startsWith(typedWord)
+        key === expectedCharacter
     ) {
 
+        typedWord += key;
+
+
+        updateWordProgress();
+
+
         /*
-            Word completed
+            Whole word completed
         */
 
         if (
@@ -356,16 +394,69 @@ function handleWordTyping(key) {
         }
 
         return;
+
     }
 
 
     /*
-        Wrong character
+        WRONG
     */
 
     wrongInput();
 
-    typedWord = "";
+}
+
+
+// ==================================================
+// UPDATE WORD PROGRESS
+// ==================================================
+
+function updateWordProgress() {
+
+    const characters =
+        currentElement.querySelectorAll(
+            ".target-character"
+        );
+
+
+    characters.forEach(
+        (character, index) => {
+
+            character.classList.remove(
+                "current"
+            );
+
+
+            if (
+                index < typedWord.length
+            ) {
+
+                character.classList.add(
+                    "correct"
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+        Highlight next character
+    */
+
+    if (
+        typedWord.length <
+        characters.length
+    ) {
+
+        characters[
+            typedWord.length
+        ].classList.add(
+            "current"
+        );
+
+    }
 
 }
 
@@ -382,26 +473,25 @@ function wrongInput() {
 
 
     /*
-        Remove previous animation class
-        so the animation can play again.
+        Remove previous wrong state
+        so animation can restart.
     */
 
-    currentElement.classList.remove("shake");
+    currentElement.classList.remove(
+        "wrong"
+    );
 
-
-    /*
-        Force browser to restart animation.
-    */
 
     void currentElement.offsetWidth;
 
 
-    currentElement.classList.add("shake");
+    currentElement.classList.add(
+        "wrong"
+    );
 
 
     /*
-        Optional tiny haptic feedback
-        on supported mobile devices.
+        Mobile vibration
     */
 
     if (
@@ -412,11 +502,63 @@ function wrongInput() {
 
     }
 
+
+    /*
+        Remove red state after
+        a short moment.
+    */
+
+    setTimeout(() => {
+
+        if (currentElement) {
+
+            currentElement.classList.remove(
+                "wrong"
+            );
+
+        }
+
+    }, 220);
+
 }
 
 
 // ==================================================
-// CORRECT TARGET
+// CORRECT SINGLE LETTER
+// ==================================================
+
+function correctSingleLetter() {
+
+    if (!currentElement) {
+        return;
+    }
+
+
+    /*
+        Green feedback first
+    */
+
+    currentElement.classList.add(
+        "correct-letter"
+    );
+
+
+    /*
+        Small delay before burst
+        so user sees the green state.
+    */
+
+    setTimeout(() => {
+
+        targetCompleted();
+
+    }, 100);
+
+}
+
+
+// ==================================================
+// TARGET COMPLETED
 // ==================================================
 
 function targetCompleted() {
@@ -434,16 +576,19 @@ function targetCompleted() {
     acceptingInput = false;
 
 
-    const element = currentElement;
+    const element =
+        currentElement;
 
 
     /*
-        Get the target's position
+        Get target position
     */
 
-    const rect = element.getBoundingClientRect();
+    const rect =
+        element.getBoundingClientRect();
 
-    const areaRect = gameArea.getBoundingClientRect();
+    const areaRect =
+        gameArea.getBoundingClientRect();
 
 
     const centerX =
@@ -459,7 +604,7 @@ function targetCompleted() {
 
 
     /*
-        Create the burst
+        Create burst
     */
 
     createBurst(
@@ -469,26 +614,24 @@ function targetCompleted() {
     );
 
 
-    /*
-        Remove original target
-    */
-
     element.remove();
 
-    currentElement = null;
+    currentElement =
+        null;
 
 
     /*
-        Increase progress
+        Progress
     */
 
     score++;
 
-    scoreDisplay.textContent = score;
+    scoreDisplay.textContent =
+        score;
 
 
     /*
-        New target shortly after burst
+        Next target
     */
 
     setTimeout(() => {
@@ -504,21 +647,36 @@ function targetCompleted() {
 // BURST EFFECT
 // ==================================================
 
-function createBurst(text, x, y) {
+function createBurst(
+    text,
+    x,
+    y
+) {
 
     /*
-        Flash in the center
+        Center flash
     */
 
-    const flash = document.createElement("div");
+    const flash =
+        document.createElement("div");
 
-    flash.classList.add("burst-flash");
 
-    flash.style.left = `${x - 5}px`;
+    flash.classList.add(
+        "burst-flash"
+    );
 
-    flash.style.top = `${y - 5}px`;
 
-    gameArea.appendChild(flash);
+    flash.style.left =
+        `${x - 5}px`;
+
+
+    flash.style.top =
+        `${y - 5}px`;
+
+
+    gameArea.appendChild(
+        flash
+    );
 
 
     setTimeout(() => {
@@ -529,24 +687,31 @@ function createBurst(text, x, y) {
 
 
     /*
-        Turn the original text into
-        individual letters.
+        Turn target into particles
     */
 
-    const characters = text.split("");
+    let characters =
+        text.split("");
 
 
     /*
-        If it is only one letter,
-        create several tiny random letters.
+        Single letters produce
+        random mini letters.
     */
 
-    if (characters.length === 1) {
+    if (
+        characters.length === 1
+    ) {
 
         const randomCharacters =
             "abcdefghijklmnopqrstuvwxyz";
 
-        for (let i = 0; i < 5; i++) {
+
+        for (
+            let i = 0;
+            i < 5;
+            i++
+        ) {
 
             characters.push(
                 randomCharacters[
@@ -562,104 +727,111 @@ function createBurst(text, x, y) {
     }
 
 
-    characters.forEach((character, index) => {
+    /*
+        Create particles
+    */
 
-        const particle =
-            document.createElement("span");
+    characters.forEach(
+        (character, index) => {
 
-
-        particle.classList.add(
-            "burst-letter"
-        );
-
-
-        particle.textContent = character;
+            const particle =
+                document.createElement("span");
 
 
-        particle.style.left =
-            `${x}px`;
+            particle.classList.add(
+                "burst-letter"
+            );
 
 
-        particle.style.top =
-            `${y}px`;
+            particle.textContent =
+                character;
 
 
-        /*
-            Different direction for
-            every particle.
-        */
-
-        const angle =
-            Math.random() *
-            Math.PI *
-            2;
+            particle.style.left =
+                `${x}px`;
 
 
-        const distance =
-            35 +
-            Math.random() * 80;
+            particle.style.top =
+                `${y}px`;
 
 
-        const moveX =
-            Math.cos(angle) *
-            distance;
+            /*
+                Random direction
+            */
+
+            const angle =
+                Math.random() *
+                Math.PI *
+                2;
 
 
-        const moveY =
-            Math.sin(angle) *
-            distance;
+            const distance =
+                35 +
+                Math.random() * 80;
 
 
-        const rotation =
-            (Math.random() - 0.5) *
-            360;
+            const moveX =
+                Math.cos(angle) *
+                distance;
 
 
-        particle.style.setProperty(
-            "--move-x",
-            `${moveX}px`
-        );
+            const moveY =
+                Math.sin(angle) *
+                distance;
 
 
-        particle.style.setProperty(
-            "--move-y",
-            `${moveY}px`
-        );
+            const rotation =
+                (Math.random() - 0.5) *
+                360;
 
 
-        particle.style.setProperty(
-            "--rotate",
-            `${rotation}deg`
-        );
+            particle.style.setProperty(
+                "--move-x",
+                `${moveX}px`
+            );
 
 
-        /*
-            Slight variation in size
-        */
-
-        particle.style.fontSize =
-            `${12 + Math.random() * 8}px`;
+            particle.style.setProperty(
+                "--move-y",
+                `${moveY}px`
+            );
 
 
-        /*
-            Tiny stagger makes the burst
-            feel organic.
-        */
-
-        particle.style.animationDelay =
-            `${index * 15}ms`;
+            particle.style.setProperty(
+                "--rotate",
+                `${rotation}deg`
+            );
 
 
-        gameArea.appendChild(particle);
+            /*
+                Random particle size
+            */
+
+            particle.style.fontSize =
+                `${12 + Math.random() * 8}px`;
 
 
-        setTimeout(() => {
+            /*
+                Tiny stagger
+            */
 
-            particle.remove();
+            particle.style.animationDelay =
+                `${index * 15}ms`;
 
-        }, 800);
 
-    });
+            gameArea.appendChild(
+                particle
+            );
+
+
+            setTimeout(() => {
+
+                particle.remove();
+
+            }, 800);
+
+        }
+    );
 
 }
 
