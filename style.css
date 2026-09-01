@@ -8,8 +8,11 @@
     --background: #0c0f14;
     --text: #eef1f7;
     --muted: #777f91;
+
     --accent: #9ba8ff;
-    --correct: #a5e8ba;
+
+    --correct: #69e69a;
+    --wrong: #ff6b6b;
 }
 
 body {
@@ -43,7 +46,9 @@ body {
 }
 
 
-/* ---------------- TOP BAR ---------------- */
+/* ==================================================
+   TOP BAR
+================================================== */
 
 .top-bar {
     height: 75px;
@@ -51,12 +56,16 @@ body {
     padding: 0 35px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom:
+        1px solid rgba(255,255,255,0.05);
 
-    background: rgba(12,15,20,0.65);
+    background:
+        rgba(12,15,20,0.65);
 
     backdrop-filter: blur(15px);
 
@@ -65,11 +74,13 @@ body {
 
 .logo {
     font-size: 21px;
+
     font-weight: 700;
 }
 
 .logo span {
     color: var(--accent);
+
     margin-right: 7px;
 }
 
@@ -99,16 +110,20 @@ body {
 
 .score span {
     font-size: 12px;
+
     color: var(--muted);
 }
 
 .score strong {
     font-size: 18px;
+
     font-weight: 500;
 }
 
 
-/* ---------------- GAME AREA ---------------- */
+/* ==================================================
+   GAME AREA
+================================================== */
 
 #gameArea {
     position: relative;
@@ -119,7 +134,9 @@ body {
 }
 
 
-/* ---------------- WELCOME ---------------- */
+/* ==================================================
+   WELCOME
+================================================== */
 
 .welcome {
     position: absolute;
@@ -149,7 +166,8 @@ body {
 
     border-radius: 20px;
 
-    background: rgba(155,168,255,0.12);
+    background:
+        rgba(155,168,255,0.12);
 
     color: var(--accent);
 
@@ -175,9 +193,11 @@ body {
 .welcome button {
     margin-top: 30px;
 
-    border: 1px solid rgba(155,168,255,0.35);
+    border:
+        1px solid rgba(155,168,255,0.35);
 
-    background: rgba(155,168,255,0.12);
+    background:
+        rgba(155,168,255,0.12);
 
     color: var(--text);
 
@@ -193,13 +213,16 @@ body {
 }
 
 .welcome button:hover {
-    background: rgba(155,168,255,0.2);
+    background:
+        rgba(155,168,255,0.2);
 
     transform: translateY(-2px);
 }
 
 
-/* ---------------- TARGET ---------------- */
+/* ==================================================
+   TARGET
+================================================== */
 
 .game-item {
     position: absolute;
@@ -216,15 +239,16 @@ body {
 
     pointer-events: none;
 
-    animation: targetAppear 0.35s ease forwards;
+    animation:
+        targetAppear 0.35s ease forwards;
 
     transition:
-        color 0.15s ease,
-        transform 0.15s ease;
+        color 0.12s ease,
+        text-shadow 0.12s ease;
 }
 
 
-/* Single letters */
+/* SINGLE LETTER */
 
 .game-item.single-letter {
     font-size: 36px;
@@ -235,22 +259,84 @@ body {
 }
 
 
-/* Soft glow */
+/* ==================================================
+   WORD CHARACTERS
+================================================== */
 
-.game-item.target {
+.target-character {
+    display: inline-block;
+
+    color: #737b8c;
+
+    transition:
+        color 0.12s ease,
+        transform 0.12s ease,
+        text-shadow 0.12s ease;
+}
+
+
+/* Correctly typed character */
+
+.target-character.correct {
+    color: var(--correct);
+
+    text-shadow:
+        0 0 8px rgba(105,230,154,0.5);
+
+    transform: translateY(-2px);
+}
+
+
+/* Current character */
+
+.target-character.current {
     color: var(--text);
 
     text-shadow:
-        0 0 15px rgba(155,168,255,0.15);
+        0 0 12px rgba(155,168,255,0.35);
 }
 
 
-/* ---------------- WRONG VIBRATION ---------------- */
+/* Wrong feedback */
 
-.game-item.shake {
-    animation: wrongShake 0.18s ease-in-out;
+.game-item.wrong {
+    color: var(--wrong);
+
+    text-shadow:
+        0 0 15px rgba(255,107,107,0.55);
+
+    animation:
+        wrongShake 0.18s ease-in-out;
 }
 
+
+/* ==================================================
+   SINGLE LETTER STATES
+================================================== */
+
+.game-item.single-letter.correct-letter {
+    color: var(--correct);
+
+    text-shadow:
+        0 0 20px rgba(105,230,154,0.7);
+
+    transform: scale(1.12);
+}
+
+.game-item.single-letter.wrong-letter {
+    color: var(--wrong);
+
+    text-shadow:
+        0 0 20px rgba(255,107,107,0.7);
+
+    animation:
+        wrongShake 0.18s ease-in-out;
+}
+
+
+/* ==================================================
+   WRONG SHAKE
+================================================== */
 
 @keyframes wrongShake {
 
@@ -281,7 +367,9 @@ body {
 }
 
 
-/* ---------------- TARGET APPEAR ---------------- */
+/* ==================================================
+   TARGET APPEAR
+================================================== */
 
 @keyframes targetAppear {
 
@@ -312,7 +400,9 @@ body {
 }
 
 
-/* ---------------- BURST PARTICLES ---------------- */
+/* ==================================================
+   BURST PARTICLES
+================================================== */
 
 .burst-letter {
     position: absolute;
@@ -328,7 +418,9 @@ body {
     color: var(--correct);
 
     animation:
-        burstLetter 0.65s cubic-bezier(.2,.8,.2,1)
+        burstLetter
+        0.65s
+        cubic-bezier(.2,.8,.2,1)
         forwards;
 }
 
@@ -339,7 +431,7 @@ body {
         opacity: 1;
 
         transform:
-            translate(0, 0)
+            translate(0,0)
             scale(1);
 
         filter: blur(0);
@@ -366,7 +458,9 @@ body {
 }
 
 
-/* ---------------- BURST FLASH ---------------- */
+/* ==================================================
+   BURST FLASH
+================================================== */
 
 .burst-flash {
     position: absolute;
@@ -381,10 +475,14 @@ body {
     background: var(--correct);
 
     box-shadow:
-        0 0 12px rgba(165,232,186,0.8),
-        0 0 30px rgba(165,232,186,0.35);
+        0 0 12px rgba(105,230,154,0.8),
+        0 0 30px rgba(105,230,154,0.35);
 
-    animation: burstFlash 0.45s ease-out forwards;
+    animation:
+        burstFlash
+        0.45s
+        ease-out
+        forwards;
 }
 
 
@@ -405,7 +503,9 @@ body {
 }
 
 
-/* ---------------- FOOTER ---------------- */
+/* ==================================================
+   FOOTER
+================================================== */
 
 footer {
     height: 45px;
@@ -420,11 +520,14 @@ footer {
 
     font-size: 12px;
 
-    border-top: 1px solid rgba(255,255,255,0.03);
+    border-top:
+        1px solid rgba(255,255,255,0.03);
 }
 
 
-/* ---------------- MOBILE ---------------- */
+/* ==================================================
+   MOBILE
+================================================== */
 
 @media (max-width: 600px) {
 
