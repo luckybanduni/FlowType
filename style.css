@@ -4,25 +4,34 @@
     box-sizing: border-box;
 }
 
+
 :root {
+
     --background: #0c0f14;
+
     --text: #eef1f7;
+
     --muted: #777f91;
 
     --accent: #9ba8ff;
 
     --correct: #69e69a;
-    --wrong: #ff6b6b;
+
+    --wrong: #ff6868;
+
 }
 
+
 body {
+
     min-height: 100vh;
 
     background:
+
         radial-gradient(
-            circle at 50% 30%,
+            circle at 50% 20%,
             #171c28 0%,
-            #0c0f14 60%
+            #0c0f14 65%
         );
 
     color: var(--text);
@@ -36,21 +45,31 @@ body {
         sans-serif;
 
     overflow: hidden;
+
 }
 
+
+/* =====================================================
+   GAME
+===================================================== */
+
 .game {
+
     height: 100vh;
 
     display: flex;
+
     flex-direction: column;
+
 }
 
 
-/* ==================================================
+/* =====================================================
    TOP BAR
-================================================== */
+===================================================== */
 
 .top-bar {
+
     height: 75px;
 
     padding: 0 35px;
@@ -61,355 +80,494 @@ body {
 
     justify-content: space-between;
 
+    background:
+        rgba(12,15,20,0.7);
+
     border-bottom:
         1px solid rgba(255,255,255,0.05);
 
-    background:
-        rgba(12,15,20,0.65);
-
     backdrop-filter: blur(15px);
 
-    z-index: 10;
+    z-index: 100;
+
 }
 
+
 .logo {
+
     font-size: 21px;
 
     font-weight: 700;
+
 }
 
+
 .logo span {
+
     color: var(--accent);
 
     margin-right: 7px;
+
 }
 
+
 .level {
+
     position: absolute;
 
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
-    font-size: 13px;
+    font-size: 12px;
 
     color: var(--muted);
 
-    letter-spacing: 1px;
-
     text-transform: uppercase;
+
+    letter-spacing: 1.5px;
+
 }
 
+
 .score {
+
     display: flex;
 
     align-items: center;
 
     gap: 10px;
+
 }
+
 
 .score span {
-    font-size: 12px;
 
     color: var(--muted);
+
+    font-size: 12px;
+
 }
 
+
 .score strong {
+
     font-size: 18px;
 
     font-weight: 500;
+
 }
 
 
-/* ==================================================
+/* =====================================================
    GAME AREA
-================================================== */
+===================================================== */
 
 #gameArea {
+
     position: relative;
 
     flex: 1;
 
     overflow: hidden;
+
 }
 
 
-/* ==================================================
+/* =====================================================
    WELCOME
-================================================== */
+===================================================== */
 
 .welcome {
+
     position: absolute;
 
     top: 50%;
+
     left: 50%;
 
-    transform: translate(-50%, -50%);
-
-    text-align: center;
+    transform:
+        translate(-50%, -50%);
 
     width: 90%;
 
-    max-width: 500px;
+    max-width: 600px;
+
+    text-align: center;
+
 }
 
+
 .welcome-icon {
-    width: 70px;
-    height: 70px;
+
+    width: 75px;
+
+    height: 75px;
 
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
-    margin: 0 auto 25px;
+    margin:
+        0 auto 22px;
 
-    border-radius: 20px;
+    border-radius: 22px;
 
     background:
         rgba(155,168,255,0.12);
 
     color: var(--accent);
 
-    font-size: 30px;
+    font-size: 32px;
+
 }
 
+
 .welcome h1 {
-    font-size: 48px;
+
+    font-size: 50px;
 
     letter-spacing: -2px;
 
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+
 }
 
-.welcome p {
+
+.welcome > p {
+
     color: var(--muted);
 
     line-height: 1.7;
 
-    font-size: 15px;
+    font-size: 14px;
+
 }
 
-.welcome button {
-    margin-top: 30px;
+
+/* =====================================================
+   SPEED SECTION
+===================================================== */
+
+.speed-section {
+
+    margin-top: 28px;
+
+}
+
+
+.speed-title {
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 12px;
+
+}
+
+
+.speed-options {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.speed-option {
+
+    min-width: 85px;
+
+    padding: 10px 12px;
+
+    border-radius: 11px;
 
     border:
-        1px solid rgba(155,168,255,0.35);
+        1px solid rgba(255,255,255,0.07);
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: var(--muted);
+
+    cursor: pointer;
+
+    transition:
+        0.2s ease;
+
+}
+
+
+.speed-option span {
+
+    display: block;
+
+    font-size: 11px;
+
+    margin-top: 5px;
+
+}
+
+
+.speed-option:hover {
+
+    border-color:
+        rgba(155,168,255,0.35);
+
+    color: var(--text);
+
+}
+
+
+.speed-option.active {
+
+    color: var(--text);
+
+    border-color:
+        rgba(155,168,255,0.45);
+
+    background:
+        rgba(155,168,255,0.12);
+
+    box-shadow:
+        0 0 20px
+        rgba(155,168,255,0.06);
+
+}
+
+
+/* =====================================================
+   START BUTTON
+===================================================== */
+
+.start-button {
+
+    margin-top: 27px;
+
+    padding:
+        13px 24px;
+
+    border-radius: 12px;
+
+    border:
+        1px solid
+        rgba(155,168,255,0.4);
 
     background:
         rgba(155,168,255,0.12);
 
     color: var(--text);
 
-    padding: 13px 23px;
-
-    border-radius: 12px;
-
     font-size: 14px;
 
     cursor: pointer;
 
-    transition: 0.25s ease;
+    transition:
+        0.2s ease;
+
 }
 
-.welcome button:hover {
+
+.start-button:hover {
+
     background:
         rgba(155,168,255,0.2);
 
-    transform: translateY(-2px);
+    transform:
+        translateY(-2px);
+
 }
 
 
-/* ==================================================
-   TARGET
-================================================== */
+/* =====================================================
+   FALLING TARGET
+===================================================== */
 
-.game-item {
+.falling-item {
+
     position: absolute;
+
+    top: -70px;
+
+    padding: 5px 8px;
 
     font-size: 25px;
 
     font-weight: 500;
 
-    color: #aeb5c5;
-
-    letter-spacing: 0.5px;
+    color: #b1b8c8;
 
     user-select: none;
 
     pointer-events: none;
 
-    animation:
-        targetAppear 0.35s ease forwards;
+    white-space: nowrap;
 
-    transition:
-        color 0.12s ease,
-        text-shadow 0.12s ease;
+    z-index: 5;
+
+    animation:
+        fall linear forwards;
+
 }
 
 
-/* SINGLE LETTER */
+.falling-item.single-letter {
 
-.game-item.single-letter {
     font-size: 36px;
 
-    font-weight: 500;
+    color: #c3c9d6;
 
-    color: #c2c8d6;
 }
 
 
-/* ==================================================
-   WORD CHARACTERS
-================================================== */
+/* =====================================================
+   CHARACTER STYLING
+===================================================== */
 
-.target-character {
+.character {
+
     display: inline-block;
 
-    color: #737b8c;
-
     transition:
-        color 0.12s ease,
-        transform 0.12s ease,
-        text-shadow 0.12s ease;
+        0.12s ease;
+
 }
 
 
-/* Correctly typed character */
+.character.correct {
 
-.target-character.correct {
     color: var(--correct);
 
     text-shadow:
-        0 0 8px rgba(105,230,154,0.5);
+        0 0 9px
+        rgba(105,230,154,0.55);
 
-    transform: translateY(-2px);
+    transform:
+        translateY(-2px)
+        scale(1.03);
+
 }
 
 
-/* Current character */
+/* =====================================================
+   CURRENT CHARACTER
+===================================================== */
 
-.target-character.current {
-    color: var(--text);
+.character.current {
+
+    color: #f2f3f7;
 
     text-shadow:
-        0 0 12px rgba(155,168,255,0.35);
+        0 0 12px
+        rgba(155,168,255,0.3);
+
 }
 
 
-/* Wrong feedback */
+/* =====================================================
+   WRONG FEEDBACK
+===================================================== */
 
-.game-item.wrong {
+.falling-item.wrong {
+
     color: var(--wrong);
 
     text-shadow:
-        0 0 15px rgba(255,107,107,0.55);
+        0 0 15px
+        rgba(255,104,104,0.55);
 
     animation:
         wrongShake 0.18s ease-in-out;
+
 }
 
 
-/* ==================================================
-   SINGLE LETTER STATES
-================================================== */
+/* =====================================================
+   FALL ANIMATION
+===================================================== */
 
-.game-item.single-letter.correct-letter {
-    color: var(--correct);
+@keyframes fall {
 
-    text-shadow:
-        0 0 20px rgba(105,230,154,0.7);
+    from {
 
-    transform: scale(1.12);
+        transform:
+            translateY(0);
+
+    }
+
+    to {
+
+        transform:
+            translateY(
+                calc(100vh + 120px)
+            );
+
+    }
+
 }
 
-.game-item.single-letter.wrong-letter {
-    color: var(--wrong);
 
-    text-shadow:
-        0 0 20px rgba(255,107,107,0.7);
-
-    animation:
-        wrongShake 0.18s ease-in-out;
-}
-
-
-/* ==================================================
+/* =====================================================
    WRONG SHAKE
-================================================== */
+===================================================== */
 
 @keyframes wrongShake {
 
     0% {
-        transform: translateX(0);
+        transform:
+            translateX(0);
     }
 
     20% {
-        transform: translateX(-7px);
+        transform:
+            translateX(-7px);
     }
 
     40% {
-        transform: translateX(7px);
+        transform:
+            translateX(7px);
     }
 
     60% {
-        transform: translateX(-6px);
+        transform:
+            translateX(-6px);
     }
 
     80% {
-        transform: translateX(5px);
+        transform:
+            translateX(5px);
     }
 
     100% {
-        transform: translateX(0);
+        transform:
+            translateX(0);
     }
 
 }
 
 
-/* ==================================================
-   TARGET APPEAR
-================================================== */
-
-@keyframes targetAppear {
-
-    0% {
-        opacity: 0;
-
-        transform:
-            scale(0.65)
-            translateY(8px);
-
-        filter: blur(4px);
-    }
-
-    60% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 1;
-
-        transform:
-            scale(1)
-            translateY(0);
-
-        filter: blur(0);
-    }
-
-}
-
-
-/* ==================================================
+/* =====================================================
    BURST PARTICLES
-================================================== */
+===================================================== */
 
 .burst-letter {
+
     position: absolute;
 
     pointer-events: none;
-
-    user-select: none;
 
     font-size: 15px;
 
@@ -417,31 +575,31 @@ body {
 
     color: var(--correct);
 
+    z-index: 20;
+
     animation:
         burstLetter
-        0.65s
+        0.7s
         cubic-bezier(.2,.8,.2,1)
         forwards;
+
 }
 
 
 @keyframes burstLetter {
 
     0% {
+
         opacity: 1;
 
         transform:
             translate(0,0)
             scale(1);
 
-        filter: blur(0);
-    }
-
-    45% {
-        opacity: 1;
     }
 
     100% {
+
         opacity: 0;
 
         transform:
@@ -450,64 +608,81 @@ body {
                 var(--move-y)
             )
             rotate(var(--rotate))
-            scale(0.25);
+            scale(0.2);
 
-        filter: blur(2px);
+        filter:
+            blur(2px);
+
     }
 
 }
 
 
-/* ==================================================
+/* =====================================================
    BURST FLASH
-================================================== */
+===================================================== */
 
 .burst-flash {
+
     position: absolute;
 
     width: 10px;
+
     height: 10px;
 
     border-radius: 50%;
 
-    pointer-events: none;
-
     background: var(--correct);
 
+    pointer-events: none;
+
+    z-index: 19;
+
     box-shadow:
-        0 0 12px rgba(105,230,154,0.8),
-        0 0 30px rgba(105,230,154,0.35);
+        0 0 15px
+        rgba(105,230,154,0.8),
+
+        0 0 35px
+        rgba(105,230,154,0.3);
 
     animation:
         burstFlash
         0.45s
         ease-out
         forwards;
+
 }
 
 
 @keyframes burstFlash {
 
     0% {
+
         opacity: 0.9;
 
-        transform: scale(0.5);
+        transform:
+            scale(0.5);
+
     }
 
     100% {
+
         opacity: 0;
 
-        transform: scale(7);
+        transform:
+            scale(7);
+
     }
 
 }
 
 
-/* ==================================================
+/* =====================================================
    FOOTER
-================================================== */
+===================================================== */
 
 footer {
+
     height: 45px;
 
     display: flex;
@@ -516,35 +691,86 @@ footer {
 
     justify-content: center;
 
+    gap: 10px;
+
     color: #505765;
 
     font-size: 12px;
 
     border-top:
-        1px solid rgba(255,255,255,0.03);
+        1px solid
+        rgba(255,255,255,0.03);
+
 }
 
 
-/* ==================================================
+footer a {
+
+    color: #777f91;
+
+    text-decoration: none;
+
+    transition:
+        0.2s ease;
+
+}
+
+
+footer a:hover {
+
+    color: var(--text);
+
+}
+
+
+.footer-divider {
+
+    opacity: 0.5;
+
+}
+
+
+/* =====================================================
    MOBILE
-================================================== */
+===================================================== */
 
 @media (max-width: 600px) {
 
     .top-bar {
+
         padding: 0 18px;
+
     }
+
 
     .welcome h1 {
-        font-size: 38px;
+
+        font-size: 40px;
+
     }
 
-    .game-item {
+
+    .speed-option {
+
+        min-width: 72px;
+
+        padding:
+            8px 9px;
+
+    }
+
+
+    .falling-item {
+
         font-size: 21px;
+
     }
 
-    .game-item.single-letter {
+
+    .falling-item.single-letter {
+
         font-size: 30px;
+
     }
 
 }
