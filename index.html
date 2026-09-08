@@ -24,12 +24,32 @@
             </div>
 
             <div class="level">
-                Level 1
+                <span>LEVEL</span>
+                <strong id="level">1</strong>
             </div>
 
-            <div class="score">
-                <span>Typed</span>
-                <strong id="score">0</strong>
+            <div class="stats">
+
+                <div class="stat">
+                    <span>WPM</span>
+                    <strong id="wpm">0</strong>
+                </div>
+
+                <div class="stat">
+                    <span>ACC</span>
+                    <strong id="accuracy">100%</strong>
+                </div>
+
+                <div class="stat">
+                    <span>COMBO</span>
+                    <strong id="combo">0</strong>
+                </div>
+
+                <div class="stat typed-stat">
+                    <span>TYPED</span>
+                    <strong id="score">0</strong>
+                </div>
+
             </div>
 
         </header>
@@ -41,7 +61,7 @@
 
             <!-- START SCREEN -->
 
-            <div class="welcome" id="welcome">
+            <section class="welcome" id="welcome">
 
                 <div class="welcome-icon">
                     ⌨
@@ -50,59 +70,44 @@
                 <h1>Just type.</h1>
 
                 <p>
-                    Words and letters will gently fall from above.
+                  Practice makes a man Perfect
                     <br>
-                    Choose your own pace.
+                    
                 </p>
 
 
-                <!-- SPEED SELECTION -->
+                <!-- SPEED -->
 
                 <div class="speed-section">
 
                     <p class="speed-title">
-                        Choose your speed
+                        Choose your Level
                     </p>
 
                     <div class="speed-options">
 
-                        <button
-                            class="speed-option active"
-                            data-speed="slow"
-                        >
-                            🐢
+                        <button class="speed-option active" data-speed="slow">
+                            <span class="speed-icon">🐢</span>
                             <span>Relaxed</span>
                         </button>
 
-                        <button
-                            class="speed-option"
-                            data-speed="easy"
-                        >
-                            🚶
+                        <button class="speed-option" data-speed="easy">
+                            <span class="speed-icon">🚶</span>
                             <span>Easy</span>
                         </button>
 
-                        <button
-                            class="speed-option"
-                            data-speed="normal"
-                        >
-                            🏃
+                        <button class="speed-option" data-speed="normal">
+                            <span class="speed-icon">🏃</span>
                             <span>Normal</span>
                         </button>
 
-                        <button
-                            class="speed-option"
-                            data-speed="fast"
-                        >
-                            ⚡
+                        <button class="speed-option" data-speed="fast">
+                            <span class="speed-icon">⚡</span>
                             <span>Fast</span>
                         </button>
 
-                        <button
-                            class="speed-option"
-                            data-speed="very-fast"
-                        >
-                            🔥
+                        <button class="speed-option" data-speed="very-fast">
+                            <span class="speed-icon">🔥</span>
                             <span>Very Fast</span>
                         </button>
 
@@ -111,12 +116,100 @@
                 </div>
 
 
-                <button
-                    id="startButton"
-                    class="start-button"
-                >
+                <button id="startButton" class="start-button">
                     Start typing
                 </button>
+
+            </section>
+
+
+            <!-- ================= HUD ================= -->
+
+            <div class="game-controls" id="gameControls">
+
+                <button id="pauseButton" class="control-button" aria-label="Pause game">
+                    ⏸
+                </button>
+
+                <button id="restartButton" class="control-button" aria-label="Restart game">
+                    ↻
+                </button>
+
+                <button id="soundButton" class="control-button" aria-label="Toggle sound">
+                    🔊
+                </button>
+
+            </div>
+
+
+            <!-- PAUSE OVERLAY -->
+
+            <div class="pause-overlay" id="pauseOverlay">
+
+                <div class="pause-card">
+
+                    <div class="pause-icon">Ⅱ</div>
+
+                    <h2>Paused</h2>
+
+                    <p>Take a breath. Your flow is waiting.</p>
+
+                    <button id="resumeButton" class="start-button">
+                        Continue
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESULTS -->
+
+            <div class="results-overlay" id="resultsOverlay">
+
+                <div class="results-card">
+
+                    <div class="results-icon">
+                        ✦
+                    </div>
+
+                    <p class="results-label">
+                        FLOW COMPLETE
+                    </p>
+
+                    <h2 id="resultsTitle">
+                        Nice flow.
+                    </h2>
+
+                    <div class="results-grid">
+
+                        <div>
+                            <span>WPM</span>
+                            <strong id="finalWpm">0</strong>
+                        </div>
+
+                        <div>
+                            <span>Accuracy</span>
+                            <strong id="finalAccuracy">100%</strong>
+                        </div>
+
+                        <div>
+                            <span>Typed</span>
+                            <strong id="finalTyped">0</strong>
+                        </div>
+
+                        <div>
+                            <span>Best Combo</span>
+                            <strong id="finalCombo">0</strong>
+                        </div>
+
+                    </div>
+
+                    <button id="playAgainButton" class="start-button">
+                        Flow again
+                    </button>
+
+                </div>
 
             </div>
 
@@ -128,12 +221,10 @@
         <footer>
 
             <span>
-                No timer · No lives · No pressure
+               Developed by Lucky Banduni 😁
             </span>
 
             <span class="footer-divider">•</span>
-
-            <!-- CHANGE THIS TO YOUR INSTAGRAM HANDLE -->
 
             <a
                 href="https://instagram.com/Lucky_Banduni"
