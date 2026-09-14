@@ -1,45 +1,62 @@
-/* ==================================================
-   FLOWTYPE V2
-   Falling Target Engine
-   ================================================== */
+// ==================================================
+// FLOWTYPE
+// ==================================================
 
 
-/* ==================================================
-   DOM
-   ================================================== */
+// ================= ELEMENTS =================
 
 const gameArea = document.getElementById("gameArea");
-
 const welcome = document.getElementById("welcome");
+
 const startButton = document.getElementById("startButton");
 
-const scoreDisplay = document.getElementById("score");
-const wpmDisplay = document.getElementById("wpm");
-const accuracyDisplay = document.getElementById("accuracy");
-const comboDisplay = document.getElementById("combo");
-const levelDisplay = document.getElementById("level");
-
-const gameControls = document.getElementById("gameControls");
+const musicToggle = document.getElementById("musicToggle");
 
 const pauseButton = document.getElementById("pauseButton");
 const restartButton = document.getElementById("restartButton");
-const soundButton = document.getElementById("soundButton");
-
-const pauseOverlay = document.getElementById("pauseOverlay");
 const resumeButton = document.getElementById("resumeButton");
 
-const resultsOverlay = document.getElementById("resultsOverlay");
-const playAgainButton = document.getElementById("playAgainButton");
+const playAgainButton =
+    document.getElementById("playAgainButton");
 
-const finalWpm = document.getElementById("finalWpm");
-const finalAccuracy = document.getElementById("finalAccuracy");
-const finalTyped = document.getElementById("finalTyped");
-const finalCombo = document.getElementById("finalCombo");
+const gameControls =
+    document.getElementById("gameControls");
+
+const pauseScreen =
+    document.getElementById("pauseScreen");
+
+const resultsScreen =
+    document.getElementById("resultsScreen");
 
 
-/* ==================================================
-   WORD BANK
-   ================================================== */
+// ================= HUD =================
+
+const scoreDisplay =
+    document.getElementById("score");
+
+const levelDisplay =
+    document.getElementById("level");
+
+const wpmDisplay =
+    document.getElementById("wpm");
+
+const accuracyDisplay =
+    document.getElementById("accuracy");
+
+const comboDisplay =
+    document.getElementById("combo");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const finalWpm =
+    document.getElementById("finalWpm");
+
+const finalAccuracy =
+    document.getElementById("finalAccuracy");
+
+
+// ================= WORD BANK =================
 
 const words = [
 
@@ -73,7 +90,6 @@ const words = [
     "beautiful",
     "creative",
     "peaceful",
-
     "bicycle",
     "library",
     "diamond",
@@ -137,181 +153,82 @@ const words = [
 
 ];
 
-
-/* ==================================================
-   LETTER BANK
-   ================================================== */
-
-const letters = "abcdefghijklmnopqrstuvwxyz";
+const letters =
+    "abcdefghijklmnopqrstuvwxyz";
 
 
-/* ==================================================
-   DIFFICULTY
-   ==================================================
-
-   speed = falling pixels per second
-   spawn = milliseconds between targets
-   max = maximum targets on screen
-   */
+// ================= DIFFICULTIES =================
 
 const difficulties = {
 
     slow: {
         speed: 42,
-        spawn: 1450,
-        max: 3
+        spawn: 1500,
+        maxTargets: 3
     },
 
     easy: {
         speed: 55,
         spawn: 1250,
-        max: 3
+        maxTargets: 3
     },
 
     normal: {
         speed: 70,
         spawn: 1050,
-        max: 4
+        maxTargets: 4
     },
 
     fast: {
         speed: 90,
         spawn: 850,
-        max: 5
+        maxTargets: 5
     },
 
     "very-fast": {
         speed: 115,
         spawn: 650,
-        max: 6
+        maxTargets: 6
     }
 
 };
 
 
-/* ==================================================
-   GAME STATE
-   ================================================== */
+// ================= GAME VARIABLES =================
 
 let selectedSpeed = "slow";
 
+let targets = [];
+
 let gameStarted = false;
-let gamePaused = false;
+let paused = false;
 
 let score = 0;
-
-let totalKeystrokes = 0;
-let correctKeystrokes = 0;
-
 let combo = 0;
-let bestCombo = 0;
 
-let level = 1;
+let totalTyped = 0;
+let correctTyped = 0;
+
+let typedCharacters = 0;
 
 let startTime = 0;
 
 let spawnTimer = null;
 let animationFrame = null;
 
-let targets = [];
-
-let typedTarget = null;
-
-let soundEnabled = true;
+let lastFrameTime = 0;
 
 
-/* ==================================================
-   AUDIO
-   ================================================== */
+// ================= AUDIO =================
 
 let audioContext = null;
 
+let music = null;
 
-function initAudio() {
-
-    if (!soundEnabled) {
-        return;
-    }
-
-    if (!audioContext) {
-        audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
-    }
-
-    if (audioContext.state === "suspended") {
-        audioContext.resume();
-    }
-
-}
+let musicPlaying = false;
 
 
-function playTone(type = "correct") {
-
-    if (!soundEnabled) {
-        return;
-    }
-
-    initAudio();
-
-    if (!audioContext) {
-        return;
-    }
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    oscillator.connect(gain);
-
-    gain.connect(audioContext.destination);
-
-    if (type === "correct") {
-
-        oscillator.frequency.value = 520;
-
-        gain.gain.setValueAtTime(
-            0.045,
-            audioContext.currentTime
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + 0.08
-        );
-
-    } else {
-
-        oscillator.frequency.value = 170;
-
-        gain.gain.setValueAtTime(
-            0.035,
-            audioContext.currentTime
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + 0.08
-        );
-
-    }
-
-    oscillator.start();
-
-    oscillator.stop(
-        audioContext.currentTime + 0.09
-    );
-
-}
-
-
-/* ==================================================
-   RANDOM HELPERS
-   ================================================== */
+// ================= RANDOM =================
 
 function randomLetter() {
 
@@ -330,176 +247,161 @@ function randomWord() {
         Math.floor(
             Math.random() * words.length
         )
-    ].toLowerCase();
+    ];
 
 }
 
 
-/* ==================================================
-   CREATE TARGET TEXT
-   ================================================== */
+// ================= SPEED BUTTONS =================
 
-function createTargetText() {
-
-    const isLetter = Math.random() < 0.38;
-
-    return {
-        text: isLetter
-            ? randomLetter()
-            : randomWord(),
-
-        isLetter
-    };
-
-}
+const speedButtons =
+    document.querySelectorAll(".speed-option");
 
 
-/* ==================================================
-   POSITION CHECK
-   ==================================================
+speedButtons.forEach(button => {
 
-   Prevents new targets from spawning
-   directly on top of existing targets.
-   */
+    button.addEventListener("click", () => {
 
-function positionIsSafe(x, width) {
+        selectedSpeed =
+            button.dataset.speed;
 
-    const minimumGap = 55;
+        speedButtons.forEach(btn => {
 
-    for (const target of targets) {
+            btn.classList.remove("active");
 
-        const left = target.x;
+        });
 
-        const right =
-            target.x + target.width;
+        button.classList.add("active");
 
-        const newRight =
-            x + width;
+    });
 
-        const horizontalOverlap =
-            x < right + minimumGap &&
-            newRight > left - minimumGap;
-
-        if (horizontalOverlap) {
-            return false;
-        }
-
-    }
-
-    return true;
-
-}
+});
 
 
-/* ==================================================
-   FIND SAFE X
-   ================================================== */
-
-function findSafeX(width) {
-
-    const areaWidth =
-        gameArea.clientWidth;
-
-    const padding = 35;
-
-    const maxX =
-        Math.max(
-            padding,
-            areaWidth - width - padding
-        );
-
-    for (let attempt = 0; attempt < 25; attempt++) {
-
-        const x =
-            padding +
-            Math.random() *
-            Math.max(1, maxX - padding);
-
-        if (positionIsSafe(x, width)) {
-            return x;
-        }
-
-    }
-
-    return Math.max(
-        padding,
-        Math.random() *
-        Math.max(1, maxX)
-    );
-
-}
-
-
-/* ==================================================
-   CREATE TARGET
-   ================================================== */
+// ================= CREATE TARGET =================
 
 function createTarget() {
-
-    if (!gameStarted || gamePaused) {
-        return;
-    }
 
     const settings =
         difficulties[selectedSpeed];
 
-    if (targets.length >= settings.max) {
+    if (
+        targets.length >=
+        settings.maxTargets
+    ) {
         return;
     }
 
 
-    const data =
-        createTargetText();
+    const isLetter =
+        Math.random() < 0.6;
+
+    const text =
+        isLetter
+            ? randomLetter()
+            : randomWord();
 
 
     const element =
         document.createElement("div");
 
-    element.classList.add("game-item");
+    element.classList.add(
+        "game-item"
+    );
 
-    if (data.isLetter) {
-        element.classList.add("single-letter");
+
+    if (isLetter) {
+
+        element.classList.add(
+            "single-letter"
+        );
+
     }
 
-    element.dataset.text =
-        data.text;
 
-    element.textContent =
-        data.text;
+    element.dataset.text = text;
+
+    element.dataset.typed = "";
+
+    element.innerHTML =
+        `<span class="typed"></span>
+         <span class="remaining">${text}</span>`;
 
 
-    gameArea.appendChild(element);
+    const areaWidth =
+        gameArea.clientWidth;
+
+    const targetWidth =
+        isLetter ? 40 : Math.min(
+            180,
+            text.length * 17
+        );
 
 
-    const width =
-        element.offsetWidth;
+    const maxX =
+        Math.max(
+            20,
+            areaWidth - targetWidth - 20
+        );
 
-    const x =
-        findSafeX(width);
+
+    let x = 20;
+
+    let attempts = 0;
+
+
+    while (attempts < 30) {
+
+        x =
+            20 +
+            Math.random() *
+            Math.max(1, maxX - 20);
+
+
+        let safe = true;
+
+
+        for (const target of targets) {
+
+            if (
+                Math.abs(target.x - x) <
+                targetWidth + 35
+            ) {
+
+                safe = false;
+
+                break;
+
+            }
+
+        }
+
+
+        if (safe) {
+            break;
+        }
+
+
+        attempts++;
+
+    }
 
 
     const target = {
 
         element,
 
-        text: data.text,
+        text,
 
-        isLetter: data.isLetter,
+        typed: "",
 
         x,
 
         y: -45,
 
-        width,
+        width: targetWidth,
 
-        height: element.offsetHeight,
-
-        speed: settings.speed *
-            (0.9 + Math.random() * 0.2),
-
-        typed: "",
-
-        active: true
+        height: 40
 
     };
 
@@ -511,145 +413,177 @@ function createTarget() {
         `${target.y}px`;
 
 
-    requestAnimationFrame(() => {
-
-        element.classList.add("visible");
-
-    });
-
+    gameArea.appendChild(element);
 
     targets.push(target);
 
 }
 
 
-/* ==================================================
-   REMOVE TARGET
-   ================================================== */
+// ================= UPDATE TARGET VISUAL =================
 
-function removeTarget(target) {
+function updateTargetVisual(target) {
 
-    if (!target) {
-        return;
-    }
+    const typed =
+        target.element.querySelector(
+            ".typed"
+        );
 
-    target.active = false;
+    const remaining =
+        target.element.querySelector(
+            ".remaining"
+        );
 
-    const index =
-        targets.indexOf(target);
 
-    if (index !== -1) {
-        targets.splice(index, 1);
-    }
+    typed.textContent =
+        target.typed;
 
-    if (
-        typedTarget === target
-    ) {
-        typedTarget = null;
-    }
-
-    if (target.element) {
-        target.element.remove();
-    }
+    remaining.textContent =
+        target.text.slice(
+            target.typed.length
+        );
 
 }
 
 
-/* ==================================================
-   MISS TARGET
-   ================================================== */
+// ================= SPAWN =================
 
-function missTarget(target) {
+function startSpawning() {
 
-    if (!target || !target.active) {
-        return;
-    }
+    clearInterval(spawnTimer);
 
-    target.active = false;
 
-    target.element.classList.add("missed");
+    spawnTimer = setInterval(() => {
 
+        if (
+            gameStarted &&
+            !paused
+        ) {
+
+            createTarget();
+
+        }
+
+    }, difficulties[selectedSpeed].spawn);
+
+}
+
+
+// ================= START GAME =================
+
+function startGame() {
+
+    gameStarted = true;
+
+    paused = false;
+
+    score = 0;
     combo = 0;
 
-    updateHUD();
+    totalTyped = 0;
+    correctTyped = 0;
 
-    playTone("wrong");
+    typedCharacters = 0;
+
+    startTime = Date.now();
 
 
-    setTimeout(() => {
+    targets.forEach(target => {
 
-        removeTarget(target);
+        target.element.remove();
 
-    }, 250);
+    });
+
+
+    targets = [];
+
+
+    scoreDisplay.textContent = "0";
+    comboDisplay.textContent = "0";
+    levelDisplay.textContent = "1";
+    wpmDisplay.textContent = "0";
+    accuracyDisplay.textContent = "100%";
+
+
+    welcome.style.display = "none";
+
+    resultsScreen.style.display = "none";
+    pauseScreen.style.display = "none";
+
+    gameControls.style.display = "flex";
+
+
+    createTarget();
+
+    createTarget();
+
+
+    startSpawning();
+
+    lastFrameTime = performance.now();
+
+    cancelAnimationFrame(animationFrame);
+
+    animationFrame =
+        requestAnimationFrame(
+            gameLoop
+        );
 
 }
 
 
-/* ==================================================
-   GAME LOOP
-   ================================================== */
+// ================= GAME LOOP =================
 
 function gameLoop(timestamp) {
 
-    if (!gameStarted || gamePaused) {
+    if (!gameStarted) {
         return;
     }
 
 
     const delta =
         Math.min(
-            40,
-            timestamp -
-            (gameLoop.lastTime || timestamp)
+            0.05,
+            (timestamp - lastFrameTime) /
+            1000
         );
 
-    gameLoop.lastTime =
-        timestamp;
+
+    lastFrameTime = timestamp;
 
 
-    const pixels =
-        delta / 1000;
+    if (!paused) {
+
+        const speed =
+            difficulties[selectedSpeed].speed;
 
 
-    const areaHeight =
-        gameArea.clientHeight;
-
-
-    for (
-        let i = targets.length - 1;
-        i >= 0;
-        i--
-    ) {
-
-        const target =
-            targets[i];
-
-
-        if (!target.active) {
-            continue;
-        }
-
-
-        target.y +=
-            target.speed * pixels;
-
-
-        target.element.style.top =
-            `${target.y}px`;
-
-
-        /*
-         * Bottom of target reaches
-         * the game area bottom.
-         */
-
-        if (
-            target.y +
-            target.height >=
-            areaHeight
+        for (
+            let i = targets.length - 1;
+            i >= 0;
+            i--
         ) {
 
-            missTarget(target);
+            const target =
+                targets[i];
+
+
+            target.y +=
+                speed * delta;
+
+
+            target.element.style.top =
+                `${target.y}px`;
+
+
+            if (
+                target.y >
+                gameArea.clientHeight + 60
+            ) {
+
+                missTarget(i);
+
+            }
 
         }
 
@@ -657,219 +591,81 @@ function gameLoop(timestamp) {
 
 
     animationFrame =
-        requestAnimationFrame(gameLoop);
-
-}
-
-
-/* ==================================================
-   SPAWN SYSTEM
-   ================================================== */
-
-function startSpawner() {
-
-    stopSpawner();
-
-
-    createTarget();
-
-
-    spawnTimer =
-        setInterval(() => {
-
-            if (
-                gameStarted &&
-                !gamePaused
-            ) {
-
-                createTarget();
-
-            }
-
-        },
-        difficulties[selectedSpeed].spawn
-    );
-
-}
-
-
-function stopSpawner() {
-
-    if (spawnTimer) {
-
-        clearInterval(spawnTimer);
-
-        spawnTimer = null;
-
-    }
-
-}
-
-
-/* ==================================================
-   RENDER TARGET TEXT
-   ================================================== */
-
-function renderTarget(target) {
-
-    if (!target || !target.element) {
-        return;
-    }
-
-
-    const typed =
-        target.typed;
-
-    const remaining =
-        target.text.slice(
-            typed.length
+        requestAnimationFrame(
+            gameLoop
         );
 
-
-    target.element.innerHTML = "";
-
-
-    if (typed.length > 0) {
-
-        const typedSpan =
-            document.createElement("span");
-
-        typedSpan.className =
-            "typed-part";
-
-        typedSpan.textContent =
-            typed;
-
-        target.element.appendChild(
-            typedSpan
-        );
-
-    }
+}
 
 
-    const remainingSpan =
-        document.createElement("span");
+// ================= MISS =================
 
-    remainingSpan.className =
-        "remaining-part";
+function missTarget(index) {
 
-    remainingSpan.textContent =
-        remaining;
-
-    target.element.appendChild(
-        remainingSpan
-    );
+    const target =
+        targets[index];
 
 
-    target.element.classList.add(
-        "typing"
-    );
+    target.element.remove();
+
+    targets.splice(index, 1);
+
+
+    combo = 0;
+
+    updateHUD();
 
 }
 
 
-/* ==================================================
-   FIND TARGET FOR KEY
-   ================================================== */
+// ================= FIND BEST TARGET =================
 
 function findTargetForKey(key) {
 
-    /*
-     * If we're already typing a word,
-     * continue that target first.
-     */
-
-    if (
-        typedTarget &&
-        typedTarget.active
-    ) {
-
-        return typedTarget;
-
-    }
-
-
-    /*
-     * Find a target whose first
-     * character matches.
-     */
-
-    const matches =
-        targets.filter(
-            target =>
-                target.active &&
-                target.text[0] === key
+    const possible =
+        targets.filter(target =>
+            target.text
+                .toLowerCase()
+                .startsWith(
+                    target.typed +
+                    key
+                )
         );
 
 
-    if (matches.length === 0) {
+    if (!possible.length) {
         return null;
     }
 
 
-    /*
-     * Prioritize the lowest target.
-     */
-
-    matches.sort(
+    possible.sort(
         (a, b) =>
             b.y - a.y
     );
 
 
-    return matches[0];
+    return possible[0];
 
 }
 
 
-/* ==================================================
-   KEYBOARD INPUT
-   ================================================== */
+// ================= KEYBOARD =================
 
 document.addEventListener(
     "keydown",
     event => {
 
-        if (!gameStarted) {
+        if (
+            !gameStarted ||
+            paused
+        ) {
             return;
         }
 
-
-        /*
-         * Pause shortcut
-         */
 
         if (
-            event.key === "Escape" ||
-            event.key === " "
+            event.key.length !== 1
         ) {
-
-            if (
-                event.target.tagName !==
-                "BUTTON"
-            ) {
-
-                event.preventDefault();
-
-                togglePause();
-
-                return;
-
-            }
-
-        }
-
-
-        if (gamePaused) {
-            return;
-        }
-
-
-        /*
-         * Ignore special keys.
-         */
-
-        if (event.key.length !== 1) {
             return;
         }
 
@@ -878,16 +674,12 @@ document.addEventListener(
             event.key.toLowerCase();
 
 
-        totalKeystrokes++;
+        totalTyped++;
 
 
         const target =
             findTargetForKey(key);
 
-
-        /*
-         * No matching target.
-         */
 
         if (!target) {
 
@@ -900,54 +692,21 @@ document.addEventListener(
         }
 
 
-        /*
-         * Continue target.
-         */
+        target.typed += key;
 
-        const expected =
-            target.text[
-                target.typed.length
-            ];
+        correctTyped++;
 
+        typedCharacters++;
 
-        if (key === expected) {
-
-            target.typed += key;
-
-            correctKeystrokes++;
-
-            typedTarget = target;
+        updateTargetVisual(target);
 
 
-            if (
-                target.typed.length ===
-                target.text.length
-            ) {
+        if (
+            target.typed ===
+            target.text
+        ) {
 
-                targetCompleted(
-                    target
-                );
-
-            } else {
-
-                renderTarget(target);
-
-            }
-
-        } else {
-
-            wrongInput(target);
-
-            /*
-             * Reset word progress
-             * after a wrong character.
-             */
-
-            target.typed = "";
-
-            typedTarget = null;
-
-            renderTarget(target);
+            completeTarget(target);
 
         }
 
@@ -958,65 +717,9 @@ document.addEventListener(
 );
 
 
-/* ==================================================
-   WRONG INPUT
-   ================================================== */
+// ================= COMPLETE =================
 
-function wrongInput(target = null) {
-
-    const element =
-        target?.element;
-
-
-    if (element) {
-
-        element.classList.remove(
-            "shake"
-        );
-
-        void element.offsetWidth;
-
-        element.classList.add(
-            "shake"
-        );
-
-    }
-
-
-    combo = 0;
-
-    playTone("wrong");
-
-
-    if (
-        navigator.vibrate
-    ) {
-
-        navigator.vibrate(30);
-
-    }
-
-}
-
-
-/* ==================================================
-   TARGET COMPLETED
-   ================================================== */
-
-function targetCompleted(target) {
-
-    if (
-        !target ||
-        !target.active
-    ) {
-        return;
-    }
-
-
-    target.active = false;
-
-    typedTarget = null;
-
+function completeTarget(target) {
 
     const rect =
         target.element.getBoundingClientRect();
@@ -1025,13 +728,13 @@ function targetCompleted(target) {
         gameArea.getBoundingClientRect();
 
 
-    const centerX =
+    const x =
         rect.left -
         areaRect.left +
         rect.width / 2;
 
 
-    const centerY =
+    const y =
         rect.top -
         areaRect.top +
         rect.height / 2;
@@ -1039,8 +742,8 @@ function targetCompleted(target) {
 
     createBurst(
         target.text,
-        centerX,
-        centerY
+        x,
+        y
     );
 
 
@@ -1049,42 +752,31 @@ function targetCompleted(target) {
     );
 
 
+    setTimeout(() => {
+
+        target.element.remove();
+
+    }, 250);
+
+
+    targets =
+        targets.filter(
+            t => t !== target
+        );
+
+
     score++;
 
     combo++;
 
-    bestCombo =
-        Math.max(
-            bestCombo,
-            combo
-        );
-
-
-    /*
-     * Level every 10 successful targets.
-     */
-
-    level =
-        Math.floor(score / 10) + 1;
-
-
-    playTone("correct");
-
 
     if (
-        navigator.vibrate
+        targets.length === 0
     ) {
 
-        navigator.vibrate(12);
+        createTarget();
 
     }
-
-
-    setTimeout(() => {
-
-        removeTarget(target);
-
-    }, 350);
 
 
     updateHUD();
@@ -1092,9 +784,110 @@ function targetCompleted(target) {
 }
 
 
-/* ==================================================
-   BURST EFFECT
-   ================================================== */
+// ================= WRONG =================
+
+function wrongInput() {
+
+    const active =
+        targets[targets.length - 1];
+
+
+    if (!active) {
+        return;
+    }
+
+
+    active.element.classList.remove(
+        "shake"
+    );
+
+
+    void active.element.offsetWidth;
+
+
+    active.element.classList.add(
+        "shake"
+    );
+
+
+    if (navigator.vibrate) {
+
+        navigator.vibrate(35);
+
+    }
+
+
+    playWrongSound();
+
+}
+
+
+// ================= HUD =================
+
+function updateHUD() {
+
+    scoreDisplay.textContent =
+        score;
+
+
+    comboDisplay.textContent =
+        combo;
+
+
+    const level =
+        Math.floor(score / 10) + 1;
+
+
+    levelDisplay.textContent =
+        level;
+
+
+    const elapsed =
+        (Date.now() - startTime) /
+        60000;
+
+
+    let wpm = 0;
+
+
+    if (elapsed > 0) {
+
+        wpm =
+            Math.round(
+                typedCharacters /
+                5 /
+                elapsed
+            );
+
+    }
+
+
+    wpmDisplay.textContent =
+        wpm;
+
+
+    let accuracy = 100;
+
+
+    if (totalTyped > 0) {
+
+        accuracy =
+            Math.round(
+                (correctTyped /
+                    totalTyped) *
+                100
+            );
+
+    }
+
+
+    accuracyDisplay.textContent =
+        `${accuracy}%`;
+
+}
+
+
+// ================= BURST =================
 
 function createBurst(text, x, y) {
 
@@ -1104,6 +897,7 @@ function createBurst(text, x, y) {
     flash.classList.add(
         "burst-flash"
     );
+
 
     flash.style.left =
         `${x - 5}px`;
@@ -1122,23 +916,29 @@ function createBurst(text, x, y) {
     }, 500);
 
 
-    const characters =
+    let characters =
         text.split("");
 
 
-    if (characters.length === 1) {
+    if (
+        characters.length === 1
+    ) {
 
-        const randomCharacters =
+        const extra =
             "abcdefghijklmnopqrstuvwxyz";
 
 
-        for (let i = 0; i < 5; i++) {
+        for (
+            let i = 0;
+            i < 5;
+            i++
+        ) {
 
             characters.push(
-                randomCharacters[
+                extra[
                     Math.floor(
                         Math.random() *
-                        randomCharacters.length
+                        extra.length
                     )
                 ]
             );
@@ -1152,7 +952,9 @@ function createBurst(text, x, y) {
         (character, index) => {
 
             const particle =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
 
 
             particle.classList.add(
@@ -1179,7 +981,8 @@ function createBurst(text, x, y) {
 
             const distance =
                 35 +
-                Math.random() * 80;
+                Math.random() *
+                80;
 
 
             const moveX =
@@ -1232,458 +1035,325 @@ function createBurst(text, x, y) {
 
                 particle.remove();
 
-            }, 800);
+            }, 900);
 
         }
     );
 
-}
 
-
-/* ==================================================
-   HUD
-   ================================================== */
-
-function updateHUD() {
-
-    scoreDisplay.textContent =
-        score;
-
-
-    comboDisplay.textContent =
-        combo;
-
-
-    levelDisplay.textContent =
-        level;
-
-
-    const accuracy =
-        totalKeystrokes === 0
-            ? 100
-            : Math.round(
-                (
-                    correctKeystrokes /
-                    totalKeystrokes
-                ) * 100
-            );
-
-
-    accuracyDisplay.textContent =
-        `${accuracy}%`;
-
-
-    /*
-     * WPM:
-     *
-     * Standard:
-     * 5 characters = 1 word
-     */
-
-    let wpm = 0;
-
-
-    if (startTime > 0) {
-
-        const minutes =
-            (
-                Date.now() -
-                startTime
-            ) / 60000;
-
-
-        if (minutes > 0) {
-
-            wpm =
-                Math.round(
-                    (
-                        correctKeystrokes / 5
-                    ) / minutes
-                );
-
-        }
-
-    }
-
-
-    wpmDisplay.textContent =
-        wpm;
+    playCorrectSound();
 
 }
 
 
-/* ==================================================
-   START GAME
-   ================================================== */
+// ================= PAUSE =================
 
-function startGame() {
+function pauseGame() {
 
-    stopGameLoops();
-
-    clearTargets();
-
-
-    gameStarted = true;
-
-    gamePaused = false;
-
-
-    score = 0;
-
-    totalKeystrokes = 0;
-
-    correctKeystrokes = 0;
-
-    combo = 0;
-
-    bestCombo = 0;
-
-    level = 1;
-
-    typedTarget = null;
-
-
-    startTime =
-        Date.now();
-
-
-    welcome.style.display =
-        "none";
-
-
-    resultsOverlay.classList.remove(
-        "visible"
-    );
-
-
-    pauseOverlay.classList.remove(
-        "visible"
-    );
-
-
-    gameControls.classList.add(
-        "visible"
-    );
-
-
-    soundButton.textContent =
-        soundEnabled
-            ? "🔊"
-            : "🔇";
-
-
-    initAudio();
-
-
-    updateHUD();
-
-
-    startSpawner();
-
-
-    gameLoop.lastTime =
-        performance.now();
-
-
-    animationFrame =
-        requestAnimationFrame(
-            gameLoop
-        );
-
-}
-
-
-/* ==================================================
-   CLEAR TARGETS
-   ================================================== */
-
-function clearTargets() {
-
-    targets.forEach(
-        target => {
-
-            if (target.element) {
-                target.element.remove();
-            }
-
-        }
-    );
-
-
-    targets = [];
-
-    typedTarget = null;
-
-}
-
-
-/* ==================================================
-   STOP LOOPS
-   ================================================== */
-
-function stopGameLoops() {
-
-    stopSpawner();
-
-
-    if (animationFrame) {
-
-        cancelAnimationFrame(
-            animationFrame
-        );
-
-        animationFrame = null;
-
-    }
-
-}
-
-
-/* ==================================================
-   PAUSE
-   ================================================== */
-
-function togglePause() {
-
-    if (!gameStarted) {
+    if (
+        !gameStarted ||
+        paused
+    ) {
         return;
     }
 
 
-    if (gamePaused) {
+    paused = true;
 
-        resumeGame();
-
-    } else {
-
-        pauseGame();
-
-    }
-
-}
-
-
-function pauseGame() {
-
-    gamePaused = true;
-
-    pauseOverlay.classList.add(
-        "visible"
-    );
-
-
-    pauseButton.textContent =
-        "▶";
-
-
-    /*
-     * Reset animation timing
-     * to prevent a huge jump after pause.
-     */
-
-    gameLoop.lastTime =
-        performance.now();
+    pauseScreen.style.display =
+        "flex";
 
 }
 
 
 function resumeGame() {
 
-    gamePaused = false;
-
-    pauseOverlay.classList.remove(
-        "visible"
-    );
+    if (!gameStarted) {
+        return;
+    }
 
 
-    pauseButton.textContent =
-        "⏸";
+    paused = false;
+
+    pauseScreen.style.display =
+        "none";
 
 
-    gameLoop.lastTime =
+    lastFrameTime =
         performance.now();
 
-
-    animationFrame =
-        requestAnimationFrame(
-            gameLoop
-        );
-
 }
 
 
-/* ==================================================
-   END GAME
-   ================================================== */
-
-function endGame() {
-
-    gameStarted = false;
-
-    gamePaused = false;
-
-
-    stopGameLoops();
-
-
-    const accuracy =
-        totalKeystrokes === 0
-            ? 100
-            : Math.round(
-                (
-                    correctKeystrokes /
-                    totalKeystrokes
-                ) * 100
-            );
-
-
-    let wpm = 0;
-
-
-    if (startTime > 0) {
-
-        const minutes =
-            (
-                Date.now() -
-                startTime
-            ) / 60000;
-
-
-        if (minutes > 0) {
-
-            wpm =
-                Math.round(
-                    (
-                        correctKeystrokes / 5
-                    ) / minutes
-                );
-
-        }
-
-    }
-
-
-    finalWpm.textContent =
-        wpm;
-
-
-    finalAccuracy.textContent =
-        `${accuracy}%`;
-
-
-    finalTyped.textContent =
-        score;
-
-
-    finalCombo.textContent =
-        bestCombo;
-
-
-    let title =
-        "Nice flow.";
-
-
-    if (wpm >= 60) {
-        title = "You're flying.";
-    } else if (wpm >= 40) {
-        title = "Great flow.";
-    } else if (wpm >= 20) {
-        title = "Smooth typing.";
-    }
-
-
-    document.getElementById(
-        "resultsTitle"
-    ).textContent = title;
-
-
-    clearTargets();
-
-
-    gameControls.classList.remove(
-        "visible"
-    );
-
-
-    pauseOverlay.classList.remove(
-        "visible"
-    );
-
-
-    resultsOverlay.classList.add(
-        "visible"
-    );
-
-}
-
-
-/* ==================================================
-   RESTART
-   ================================================== */
+// ================= RESTART =================
 
 function restartGame() {
+
+    clearInterval(spawnTimer);
+
 
     startGame();
 
 }
 
 
-/* ==================================================
-   SPEED SELECTION
-   ================================================== */
+// ================= RESULTS =================
 
-const speedButtons =
-    document.querySelectorAll(
-        ".speed-option"
+function showResults() {
+
+    clearInterval(spawnTimer);
+
+    gameStarted = false;
+
+
+    const elapsed =
+        Math.max(
+            1,
+            (Date.now() - startTime) /
+            60000
+        );
+
+
+    const wpm =
+        Math.round(
+            typedCharacters /
+            5 /
+            elapsed
+        );
+
+
+    const accuracy =
+        totalTyped === 0
+            ? 100
+            : Math.round(
+                (correctTyped /
+                    totalTyped) *
+                100
+            );
+
+
+    finalScore.textContent =
+        score;
+
+    finalWpm.textContent =
+        wpm;
+
+    finalAccuracy.textContent =
+        `${accuracy}%`;
+
+
+    gameControls.style.display =
+        "none";
+
+
+    resultsScreen.style.display =
+        "flex";
+
+}
+
+
+// ================= AUDIO =================
+
+function initAudio() {
+
+    if (!audioContext) {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+    }
+
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+
+    }
+
+}
+
+
+function playTone(
+    frequency,
+    duration,
+    type = "sine",
+    volume = 0.035
+) {
+
+    if (!audioContext) {
+        return;
+    }
+
+
+    const oscillator =
+        audioContext.createOscillator();
+
+
+    const gain =
+        audioContext.createGain();
+
+
+    oscillator.type =
+        type;
+
+    oscillator.frequency.value =
+        frequency;
+
+
+    gain.gain.setValueAtTime(
+        volume,
+        audioContext.currentTime
     );
 
 
-speedButtons.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                speedButtons.forEach(
-                    item => {
-
-                        item.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime +
+        duration
+    );
 
 
-                button.classList.add(
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime +
+        duration
+    );
+
+}
+
+
+function playCorrectSound() {
+
+    if (!musicPlaying) {
+        return;
+    }
+
+
+    playTone(
+        620,
+        0.08,
+        "sine",
+        0.025
+    );
+
+}
+
+
+function playWrongSound() {
+
+    if (!musicPlaying) {
+        return;
+    }
+
+
+    playTone(
+        140,
+        0.10,
+        "sine",
+        0.025
+    );
+
+}
+
+
+// ================= MUSIC =================
+
+function toggleMusic() {
+
+    initAudio();
+
+
+    if (!music) {
+
+        music =
+            new Audio("music.mp3");
+
+        music.loop = true;
+
+        music.volume = 0.28;
+
+    }
+
+
+    if (musicPlaying) {
+
+        music.pause();
+
+        musicPlaying = false;
+
+        musicToggle.classList.remove(
+            "active"
+        );
+
+        musicToggle.textContent =
+            "🎵";
+
+    } else {
+
+        music.play()
+            .then(() => {
+
+                musicPlaying = true;
+
+                musicToggle.classList.add(
                     "active"
                 );
 
+                musicToggle.textContent =
+                    "🔊";
 
-                selectedSpeed =
-                    button.dataset.speed;
+            })
+            .catch(error => {
 
-            }
-        );
+                console.log(
+                    "Music could not start:",
+                    error
+                );
+
+            });
+
+    }
+
+}
+
+
+// ================= BUTTON EVENTS =================
+
+startButton.addEventListener(
+    "click",
+    () => {
+
+        initAudio();
+
+        startGame();
 
     }
 );
 
 
-/* ==================================================
-   BUTTONS
-   ================================================== */
-
-startButton.addEventListener(
+musicToggle.addEventListener(
     "click",
-    startGame
+    toggleMusic
 );
 
 
 pauseButton.addEventListener(
     "click",
-    togglePause
+    pauseGame
 );
 
 
@@ -1705,1116 +1375,28 @@ playAgainButton.addEventListener(
 );
 
 
-soundButton.addEventListener(
-    "click",
-    () => {
+// ================= KEYBOARD SHORTCUTS =================
 
-        soundEnabled =
-            !soundEnabled;
+document.addEventListener(
+    "keydown",
+    event => {
 
+        if (
+            event.key === "Escape" &&
+            gameStarted
+        ) {
 
-        soundButton.textContent =
-            soundEnabled
-                ? "🔊"
-                : "🔇";
+            if (paused) {
 
+                resumeGame();
 
-        if (soundEnabled) {
-            initAudio();
+            } else {
+
+                pauseGame();
+
+            }
+
         }
 
     }
 );
-
-
-/* ==================================================
-   WINDOW RESIZE
-   ================================================== */
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        /*
-         * Keep targets inside the
-         * new screen width.
-         */
-
-        const width =
-            gameArea.clientWidth;
-
-
-        targets.forEach(
-            target => {
-
-                const maxX =
-                    Math.max(
-                        10,
-                        width -
-                        target.width -
-                        10
-                    );
-
-
-                target.x =
-                    Math.min(
-                        target.x,
-                        maxX
-                    );
-
-
-                target.element.style.left =
-                    `${target.x}px`;
-
-            }
-        );
-
-    }
-);
-
-
-/* ==================================================
-   INITIAL HUD
-   ================================================== */
-
-updateHUD();
-```
-/* ==================================================
-   FLOWTYPE V2
-   ================================================== */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    --background: #0c0f14;
-    --background-soft: #11151d;
-
-    --text: #eef1f7;
-    --muted: #777f91;
-    --muted-dark: #505765;
-
-    --accent: #9ba8ff;
-    --accent-bright: #b8c1ff;
-    --accent-soft: rgba(155, 168, 255, 0.12);
-
-    --correct: #a5e8ba;
-    --wrong: #ff8f9b;
-
-    --border: rgba(255, 255, 255, 0.06);
-}
-
-
-/* ==================================================
-   BODY
-   ================================================== */
-
-body {
-    min-height: 100vh;
-
-    background:
-        radial-gradient(
-            circle at 50% 25%,
-            #171c28 0%,
-            #0c0f14 62%
-        );
-
-    color: var(--text);
-
-    font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    overflow: hidden;
-}
-
-
-/* ==================================================
-   GAME
-   ================================================== */
-
-.game {
-    height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-}
-
-
-/* ==================================================
-   TOP BAR
-   ================================================== */
-
-.top-bar {
-    height: 75px;
-
-    padding: 0 35px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    border-bottom: 1px solid var(--border);
-
-    background: rgba(12, 15, 20, 0.68);
-
-    backdrop-filter: blur(15px);
-
-    z-index: 20;
-}
-
-
-/* LOGO */
-
-.logo {
-    font-size: 21px;
-    font-weight: 700;
-
-    white-space: nowrap;
-}
-
-.logo span {
-    color: var(--accent);
-
-    margin-right: 7px;
-}
-
-
-/* LEVEL */
-
-.level {
-    position: absolute;
-
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    font-size: 12px;
-
-    color: var(--muted);
-
-    letter-spacing: 1.5px;
-}
-
-.level strong {
-    color: var(--accent-bright);
-
-    font-size: 13px;
-}
-
-
-/* STATS */
-
-.stats {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.stat {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.stat span {
-    font-size: 10px;
-
-    color: var(--muted);
-
-    letter-spacing: 1px;
-}
-
-.stat strong {
-    font-size: 15px;
-
-    font-weight: 500;
-
-    min-width: 25px;
-}
-
-
-/* ==================================================
-   GAME AREA
-   ================================================== */
-
-#gameArea {
-    position: relative;
-
-    flex: 1;
-
-    overflow: hidden;
-
-    isolation: isolate;
-}
-
-
-/* Subtle game atmosphere */
-
-#gameArea::before {
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-        radial-gradient(
-            circle at 50% 45%,
-            rgba(155, 168, 255, 0.035),
-            transparent 55%
-        );
-
-    z-index: -1;
-}
-
-
-/* ==================================================
-   WELCOME
-   ================================================== */
-
-.welcome {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-
-    text-align: center;
-
-    width: 92%;
-
-    max-width: 560px;
-
-    z-index: 5;
-}
-
-
-.welcome-icon {
-    width: 70px;
-    height: 70px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    margin: 0 auto 25px;
-
-    border-radius: 20px;
-
-    background: var(--accent-soft);
-
-    color: var(--accent);
-
-    font-size: 30px;
-
-    box-shadow:
-        0 0 35px rgba(155, 168, 255, 0.08);
-}
-
-
-.welcome h1 {
-    font-size: 48px;
-
-    letter-spacing: -2px;
-
-    margin-bottom: 15px;
-}
-
-
-.welcome > p {
-    color: var(--muted);
-
-    line-height: 1.7;
-
-    font-size: 15px;
-}
-
-
-/* ==================================================
-   SPEED
-   ================================================== */
-
-.speed-section {
-    margin-top: 28px;
-}
-
-
-.speed-title {
-    color: var(--muted-dark);
-
-    font-size: 11px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1.5px;
-
-    margin-bottom: 12px;
-}
-
-
-.speed-options {
-    display: flex;
-
-    justify-content: center;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-}
-
-
-.speed-option {
-    border: 1px solid var(--border);
-
-    background: rgba(255,255,255,0.025);
-
-    color: var(--muted);
-
-    padding: 10px 13px;
-
-    border-radius: 10px;
-
-    font-size: 11px;
-
-    cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
-}
-
-
-.speed-option:hover {
-    transform: translateY(-2px);
-
-    color: var(--text);
-
-    background: rgba(255,255,255,0.05);
-}
-
-
-.speed-option.active {
-    color: var(--text);
-
-    border-color: rgba(155,168,255,0.38);
-
-    background: var(--accent-soft);
-
-    box-shadow:
-        0 0 18px rgba(155,168,255,0.06);
-}
-
-
-.speed-icon {
-    font-size: 14px;
-}
-
-
-/* ==================================================
-   BUTTON
-   ================================================== */
-
-.start-button {
-    margin-top: 28px;
-
-    border: 1px solid rgba(155,168,255,0.35);
-
-    background: var(--accent-soft);
-
-    color: var(--text);
-
-    padding: 13px 24px;
-
-    border-radius: 12px;
-
-    font-size: 14px;
-
-    cursor: pointer;
-
-    transition:
-        0.25s ease;
-
-    box-shadow:
-        0 0 20px rgba(155,168,255,0.04);
-}
-
-
-.start-button:hover {
-    background: rgba(155,168,255,0.2);
-
-    border-color: rgba(155,168,255,0.55);
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 30px rgba(155,168,255,0.08);
-}
-
-
-.start-button:active {
-    transform: translateY(0);
-}
-
-
-/* ==================================================
-   FALLING TARGET
-   ================================================== */
-
-.game-item {
-    position: absolute;
-
-    top: -60px;
-
-    font-size: 24px;
-
-    font-weight: 500;
-
-    color: #aeb5c5;
-
-    letter-spacing: 0.5px;
-
-    user-select: none;
-
-    pointer-events: none;
-
-    white-space: nowrap;
-
-    z-index: 3;
-
-    opacity: 0;
-
-    transform: translateY(0);
-
-    transition:
-        color 0.15s ease,
-        text-shadow 0.15s ease,
-        opacity 0.15s ease;
-}
-
-
-.game-item.visible {
-    opacity: 1;
-}
-
-
-.game-item.single-letter {
-    font-size: 34px;
-
-    color: #c2c8d6;
-}
-
-
-.game-item.typing {
-    color: var(--text);
-
-    text-shadow:
-        0 0 20px rgba(155,168,255,0.18);
-}
-
-
-.game-item .typed-part {
-    color: var(--accent-bright);
-
-    text-shadow:
-        0 0 14px rgba(155,168,255,0.25);
-}
-
-
-.game-item .remaining-part {
-    color: #aeb5c5;
-}
-
-
-/* ==================================================
-   CORRECT
-   ================================================== */
-
-.game-item.correct {
-    color: var(--correct);
-
-    text-shadow:
-        0 0 25px rgba(165,232,186,0.3);
-
-    animation:
-        targetCorrect 0.35s ease forwards;
-}
-
-
-/* ==================================================
-   WRONG
-   ================================================== */
-
-.game-item.shake {
-    color: var(--wrong);
-
-    animation:
-        shake 0.25s ease;
-}
-
-
-/* ==================================================
-   MISSED
-   ================================================== */
-
-.game-item.missed {
-    color: rgba(255, 143, 155, 0.5);
-
-    animation:
-        missed 0.3s ease forwards;
-}
-
-
-/* ==================================================
-   ANIMATIONS
-   ================================================== */
-
-@keyframes targetCorrect {
-
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.3);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(1.6);
-    }
-}
-
-
-@keyframes shake {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-7px);
-    }
-
-    50% {
-        transform: translateX(7px);
-    }
-
-    75% {
-        transform: translateX(-4px);
-    }
-}
-
-
-@keyframes missed {
-
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    to {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-}
-
-
-/* ==================================================
-   GAME CONTROLS
-   ================================================== */
-
-.game-controls {
-    position: absolute;
-
-    top: 20px;
-    right: 25px;
-
-    display: flex;
-
-    gap: 7px;
-
-    z-index: 15;
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition: opacity 0.25s ease;
-}
-
-
-.game-controls.visible {
-    opacity: 1;
-
-    pointer-events: auto;
-}
-
-
-.control-button {
-    width: 36px;
-    height: 36px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid var(--border);
-
-    border-radius: 10px;
-
-    background: rgba(12,15,20,0.65);
-
-    backdrop-filter: blur(10px);
-
-    color: var(--muted);
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-}
-
-
-.control-button:hover {
-    color: var(--text);
-
-    border-color: rgba(155,168,255,0.3);
-
-    background: var(--accent-soft);
-
-    transform: translateY(-1px);
-}
-
-
-/* ==================================================
-   PAUSE
-   ================================================== */
-
-.pause-overlay,
-.results-overlay {
-    position: absolute;
-
-    inset: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(7,9,13,0.68);
-
-    backdrop-filter: blur(8px);
-
-    z-index: 12;
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition: opacity 0.25s ease;
-}
-
-
-.pause-overlay.visible,
-.results-overlay.visible {
-    opacity: 1;
-
-    pointer-events: auto;
-}
-
-
-.pause-card,
-.results-card {
-    width: min(90%, 430px);
-
-    text-align: center;
-
-    padding: 38px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 22px;
-
-    background: rgba(17,21,29,0.9);
-
-    box-shadow:
-        0 20px 80px rgba(0,0,0,0.35);
-
-    animation: cardIn 0.25s ease;
-}
-
-
-.pause-icon,
-.results-icon {
-    font-size: 25px;
-
-    color: var(--accent);
-
-    margin-bottom: 16px;
-}
-
-
-.pause-card h2,
-.results-card h2 {
-    font-size: 30px;
-
-    letter-spacing: -1px;
-
-    margin-bottom: 10px;
-}
-
-
-.pause-card p {
-    color: var(--muted);
-
-    font-size: 14px;
-
-    line-height: 1.6;
-}
-
-
-@keyframes cardIn {
-
-    from {
-        opacity: 0;
-        transform: translateY(10px) scale(0.97);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-
-/* ==================================================
-   RESULTS
-   ================================================== */
-
-.results-label {
-    color: var(--muted);
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-
-    margin-bottom: 8px;
-}
-
-
-.results-grid {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    margin-top: 25px;
-}
-
-
-.results-grid > div {
-    padding: 17px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 14px;
-
-    background: rgba(255,255,255,0.025);
-}
-
-
-.results-grid span {
-    display: block;
-
-    color: var(--muted);
-
-    font-size: 10px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    margin-bottom: 7px;
-}
-
-
-.results-grid strong {
-    font-size: 22px;
-
-    font-weight: 500;
-}
-
-
-.results-card .start-button {
-    margin-top: 24px;
-}
-
-
-/* ==================================================
-   BURST
-   ================================================== */
-
-.burst-flash {
-    position: absolute;
-
-    width: 10px;
-    height: 10px;
-
-    border-radius: 50%;
-
-    background: var(--correct);
-
-    box-shadow:
-        0 0 25px var(--correct);
-
-    pointer-events: none;
-
-    animation: flash 0.45s ease forwards;
-
-    z-index: 8;
-}
-
-
-.burst-letter {
-    position: absolute;
-
-    pointer-events: none;
-
-    color: var(--correct);
-
-    font-weight: 500;
-
-    animation: burstLetter 0.75s ease forwards;
-
-    z-index: 9;
-}
-
-
-@keyframes flash {
-
-    0% {
-        opacity: 0.9;
-        transform: scale(0.5);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(5);
-    }
-}
-
-
-@keyframes burstLetter {
-
-    0% {
-        opacity: 1;
-
-        transform:
-            translate(-50%, -50%)
-            scale(1)
-            rotate(0);
-    }
-
-    100% {
-        opacity: 0;
-
-        transform:
-            translate(
-                calc(-50% + var(--move-x)),
-                calc(-50% + var(--move-y))
-            )
-            scale(0.5)
-            rotate(var(--rotate));
-    }
-}
-
-
-/* ==================================================
-   FOOTER
-   ================================================== */
-
-footer {
-    height: 45px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 10px;
-
-    color: var(--muted-dark);
-
-    font-size: 12px;
-
-    border-top: 1px solid rgba(255,255,255,0.03);
-}
-
-
-footer a {
-    color: var(--muted);
-
-    text-decoration: none;
-
-    transition: color 0.2s ease;
-}
-
-
-footer a:hover {
-    color: var(--accent);
-}
-
-
-/* ==================================================
-   MOBILE
-   ================================================== */
-
-@media (max-width: 700px) {
-
-    .top-bar {
-        height: 68px;
-
-        padding: 0 15px;
-    }
-
-
-    .logo {
-        font-size: 18px;
-    }
-
-
-    .level {
-        display: none;
-    }
-
-
-    .stats {
-        gap: 10px;
-    }
-
-
-    .stat {
-        display: block;
-
-        text-align: center;
-    }
-
-
-    .stat span {
-        display: block;
-
-        font-size: 8px;
-
-        margin-bottom: 2px;
-    }
-
-
-    .stat strong {
-        font-size: 13px;
-    }
-
-
-    .typed-stat {
-        display: none;
-    }
-
-
-    .welcome h1 {
-        font-size: 40px;
-    }
-
-
-    .welcome > p {
-        font-size: 13px;
-    }
-
-
-    .speed-options {
-        gap: 6px;
-    }
-
-
-    .speed-option {
-        padding: 8px 9px;
-
-        font-size: 10px;
-    }
-
-
-    .game-item {
-        font-size: 21px;
-    }
-
-
-    .game-item.single-letter {
-        font-size: 30px;
-    }
-
-
-    .game-controls {
-        top: 12px;
-        right: 12px;
-    }
-
-
-    .pause-card,
-    .results-card {
-        padding: 28px 20px;
-    }
-
-
-    footer {
-        font-size: 10px;
-    }
-}
-
-
-@media (max-width: 430px) {
-
-    .stats {
-        gap: 6px;
-    }
-
-
-    .stat strong {
-        font-size: 12px;
-    }
-
-
-    .speed-option {
-        min-width: 85px;
-
-        justify-content: center;
-    }
-
-
-    .speed-icon {
-        display: none;
-    }
-}
