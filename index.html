@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,150 +11,230 @@
 
 <body>
 
-    <div class="game">
+<div class="game">
 
-        <!-- ================= TOP BAR ================= -->
+    <!-- ================= TOP BAR ================= -->
+    <header class="top-bar">
 
-        <header class="top-bar">
+        <div class="logo">
+            <span>⌨</span>
+            FlowType
+        </div>
 
-            <div class="logo">
-                <span>⌨</span>
-                FlowType
+        <div class="stats">
+
+            <div class="stat">
+                <span>Level</span>
+                <strong id="level">1</strong>
             </div>
 
-            <div class="level">
-                Level 1
+            <div class="stat">
+                <span>WPM</span>
+                <strong id="wpm">0</strong>
             </div>
 
-            <div class="score">
+            <div class="stat">
+                <span>ACC</span>
+                <strong id="accuracy">100%</strong>
+            </div>
+
+            <div class="stat">
+                <span>Combo</span>
+                <strong id="combo">0</strong>
+            </div>
+
+            <div class="stat">
                 <span>Typed</span>
                 <strong id="score">0</strong>
             </div>
 
-        </header>
+        </div>
+
+        <!-- MUSIC TOGGLE -->
+        <button id="musicToggle" class="icon-button" title="Music">
+            🎵
+        </button>
+
+    </header>
 
 
-        <!-- ================= GAME AREA ================= -->
+    <!-- ================= GAME AREA ================= -->
 
-        <main id="gameArea">
+    <main id="gameArea">
 
-            <!-- START SCREEN -->
+        <!-- WELCOME SCREEN -->
 
-            <div class="welcome" id="welcome">
+        <div class="welcome" id="welcome">
 
-                <div class="welcome-icon">
-                    ⌨
-                </div>
+            <div class="welcome-icon">⌨</div>
 
-                <h1>Just type.</h1>
+            <h1>Just type.</h1>
 
-                <p>
-                    Words and letters will gently fall from above.
-                    <br>
-                    Choose your own pace.
+            <p>
+                Practice makes a man Perfect
+                <br>
+                
+            </p>
+
+
+            <!-- SPEED -->
+
+            <div class="speed-section">
+
+                <p class="speed-title">
+                    Choose your speed
                 </p>
 
+                <div class="speed-options">
 
-                <!-- SPEED SELECTION -->
+                    <button
+                        class="speed-option active"
+                        data-speed="slow">
+                        🐢
+                        <span>Relaxed</span>
+                    </button>
 
-                <div class="speed-section">
+                    <button
+                        class="speed-option"
+                        data-speed="easy">
+                        🚶
+                        <span>Easy</span>
+                    </button>
 
-                    <p class="speed-title">
-                        Choose your speed
-                    </p>
+                    <button
+                        class="speed-option"
+                        data-speed="normal">
+                        🏃
+                        <span>Normal</span>
+                    </button>
 
-                    <div class="speed-options">
+                    <button
+                        class="speed-option"
+                        data-speed="fast">
+                        ⚡
+                        <span>Fast</span>
+                    </button>
 
-                        <button
-                            class="speed-option active"
-                            data-speed="slow"
-                        >
-                            🐢
-                            <span>Relaxed</span>
-                        </button>
-
-                        <button
-                            class="speed-option"
-                            data-speed="easy"
-                        >
-                            🚶
-                            <span>Easy</span>
-                        </button>
-
-                        <button
-                            class="speed-option"
-                            data-speed="normal"
-                        >
-                            🏃
-                            <span>Normal</span>
-                        </button>
-
-                        <button
-                            class="speed-option"
-                            data-speed="fast"
-                        >
-                            ⚡
-                            <span>Fast</span>
-                        </button>
-
-                        <button
-                            class="speed-option"
-                            data-speed="very-fast"
-                        >
-                            🔥
-                            <span>Very Fast</span>
-                        </button>
-
-                    </div>
+                    <button
+                        class="speed-option"
+                        data-speed="very-fast">
+                        🔥
+                        <span>Very Fast</span>
+                    </button>
 
                 </div>
 
+            </div>
 
-                <!-- START BUTTON -->
 
-                <button
-                    id="startButton"
-                    class="start-button"
-                >
-                    Start typing
+            <button
+                id="startButton"
+                class="start-button">
+                Start Typing
+            </button>
+
+        </div>
+
+
+        <!-- GAME CONTROLS -->
+
+        <div class="game-controls" id="gameControls">
+
+            <button id="pauseButton">
+                ⏸ Pause
+            </button>
+
+            <button id="restartButton">
+                ↻ Restart
+            </button>
+
+        </div>
+
+
+        <!-- PAUSE -->
+
+        <div class="pause-screen" id="pauseScreen">
+
+            <div class="pause-box">
+
+                <div class="pause-icon">Ⅱ</div>
+
+                <h2>Paused</h2>
+
+                <p>
+                    Take your time.
+                </p>
+
+                <button id="resumeButton">
+                    Continue
                 </button>
 
             </div>
 
-        </main>
+        </div>
 
 
-        <!-- ================= FOOTER ================= -->
+        <!-- RESULTS -->
 
-        <footer>
+        <div class="results-screen" id="resultsScreen">
 
-            <span>
-                No timer · No lives · No pressure
-            </span>
+            <div class="results-box">
 
-            <span class="footer-divider">
-                •
-            </span>
+                <h2>Nice flow.</h2>
 
-            <!-- CHANGE THIS TO YOUR INSTAGRAM HANDLE -->
+                <div class="result-row">
+                    <span>Typed</span>
+                    <strong id="finalScore">0</strong>
+                </div>
 
-            <a
-                href="https://instagram.com/Lucky_Banduni"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Instagram
-            </a>
+                <div class="result-row">
+                    <span>WPM</span>
+                    <strong id="finalWpm">0</strong>
+                </div>
 
-        </footer>
+                <div class="result-row">
+                    <span>Accuracy</span>
+                    <strong id="finalAccuracy">100%</strong>
+                </div>
 
-    </div>
+                <button id="playAgainButton">
+                    Play again
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
 
 
-    <!-- ================= JAVASCRIPT ================= -->
+    <!-- ================= FOOTER ================= -->
 
-    <script src="script.js"></script>
+    <footer>
+
+        <span>
+           Made By Lucky_Banduni 😁
+        </span>
+
+        <span class="footer-divider">
+            •
+        </span>
+
+        <a
+            href="https://instagram.com/Lucky_Banduni"
+            target="_blank"
+            rel="noopener noreferrer">
+
+            Instagram
+
+        </a>
+
+    </footer>
+
+</div>
+
+
+<script src="script.js"></script>
 
 </body>
-
 </html>
