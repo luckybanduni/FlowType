@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FlowType — Type Freely</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="game">
+
+        <!-- ================= TOP BAR ================= -->
+
+        <header class="top-bar">
+
+            <div class="logo">
+                <span>⌨</span>
+                FlowType
+            </div>
+
+            <div class="level">
+                Level 1
+            </div>
+
+            <div class="score">
+                <span>Typed</span>
+                <strong id="score">0</strong>
+            </div>
+
+        </header>
+
+
+        <!-- ================= GAME AREA ================= -->
+
+        <main id="gameArea">
+
+            <!-- START SCREEN -->
+
+            <div class="welcome" id="welcome">
+
+                <div class="welcome-icon">
+                    ⌨
+                </div>
+
+                <h1>Just type.</h1>
+
+                <p>
+                    Words and letters will gently fall from above.
+                    <br>
+                    Choose your own pace.
+                </p>
+
+
+                <!-- SPEED SELECTION -->
+
+                <div class="speed-section">
+
+                    <p class="speed-title">
+                        Choose your speed
+                    </p>
+
+                    <div class="speed-options">
+
+                        <button
+                            class="speed-option active"
+                            data-speed="slow"
+                        >
+                            🐢
+                            <span>Relaxed</span>
+                        </button>
+
+                        <button
+                            class="speed-option"
+                            data-speed="easy"
+                        >
+                            🚶
+                            <span>Easy</span>
+                        </button>
+
+                        <button
+                            class="speed-option"
+                            data-speed="normal"
+                        >
+                            🏃
+                            <span>Normal</span>
+                        </button>
+
+                        <button
+                            class="speed-option"
+                            data-speed="fast"
+                        >
+                            ⚡
+                            <span>Fast</span>
+                        </button>
+
+                        <button
+                            class="speed-option"
+                            data-speed="very-fast"
+                        >
+                            🔥
+                            <span>Very Fast</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- START BUTTON -->
+
+                <button
+                    id="startButton"
+                    class="start-button"
+                >
+                    Start typing
+                </button>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer>
+
+            <span>
+                No timer · No lives · No pressure
+            </span>
+
+            <span class="footer-divider">
+                •
+            </span>
+
+            <!-- CHANGE THIS TO YOUR INSTAGRAM HANDLE -->
+
+            <a
+                href="https://instagram.com/Lucky_Banduni"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Instagram
+            </a>
+
+        </footer>
+
+    </div>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
